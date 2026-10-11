@@ -227,6 +227,92 @@ TEST(NameTests, InequalityStopsAtNullWithEqualStoredLengths)
 }
 
 
+TEST(NameTests, AssignmentReusesBufferForEqualStoredLengths)
+{
+    B_Name name("Blade");
+    const B_Name source("Sword");
+    char *buffer = name.String();
+    EXPECT_EQ(&name, &(name = source));
+    EXPECT_EQ(buffer, name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("Sword", name.String());
+    EXPECT_STREQ("Sword", source.String());
+    EXPECT_NE(source.String(), name.String());
+}
+
+
+TEST(NameTests, AssignmentHandlesGrowingShrinkingAndEmptyText)
+{
+    B_Name name("a");
+    const B_Name longer("Blade");
+    const B_Name shorter("Bl");
+    const B_Name empty;
+    name = longer;
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("Blade", name.String());
+    name = shorter;
+    EXPECT_EQ(2u, name.Length());
+    EXPECT_STREQ("Bl", name.String());
+    name = empty;
+    EXPECT_EQ(0u, name.Length());
+    EXPECT_STREQ("", name.String());
+}
+
+
+TEST(NameTests, AssignmentRecomputesLengthOnlyOnReallocation)
+{
+    B_Name source("Blade");
+    source.String()[2] = '\0';
+    B_Name sameLength("Sword");
+    B_Name differentLength("a");
+    char *buffer = sameLength.String();
+    sameLength = source;
+    differentLength = source;
+    EXPECT_EQ(buffer, sameLength.String());
+    EXPECT_EQ(5u, sameLength.Length());
+    EXPECT_STREQ("Bl", sameLength.String());
+    EXPECT_EQ(2u, differentLength.Length());
+    EXPECT_STREQ("Bl", differentLength.String());
+    EXPECT_EQ(5u, source.Length());
+    EXPECT_STREQ("Bl", source.String());
+}
+
+
+TEST(NameTests, AssignmentPreservesSelfAssignmentAndIndependentOwnership)
+{
+    B_Name name("Blade");
+    name.String()[2] = '\0';
+    char *buffer = name.String();
+    EXPECT_EQ(&name, &(name = name));
+    EXPECT_EQ(buffer, name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("Bl", name.String());
+
+    B_Name source("\x80\xFF");
+    name = source;
+    EXPECT_EQ(2u, name.Length());
+    EXPECT_STREQ("\x80\xFF", name.String());
+    source.String()[0] = 'x';
+    EXPECT_STREQ("\x80\xFF", name.String());
+    name.String()[1] = 'y';
+    EXPECT_STREQ("x\xFF", source.String());
+}
+
+
+TEST(NameTests, AssignmentReturnsDestinationForChaining)
+{
+    B_Name first("a");
+    B_Name second("bb");
+    const B_Name source("Blade");
+    EXPECT_EQ(&first, &(first = second = source));
+    EXPECT_STREQ("Blade", first.String());
+    EXPECT_STREQ("Blade", second.String());
+    EXPECT_EQ(5u, first.Length());
+    EXPECT_EQ(5u, second.Length());
+    EXPECT_NE(first.String(), second.String());
+}
+
+
 TEST(NameTests, SlicesSelectPrefixAndSuffix)
 {
     const B_Name name("Blade");

@@ -181,19 +181,21 @@ unsigned int B_Name::CompareNoCase(const char *str) const
 * Entry point:            0x1000378E
 * VC++ mangling:          ??4B_Name@@QAEAAV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Name &B_Name::operator =(const B_Name &src)
 {
+    // Original self-assignment copies the buffer onto itself; keep it unchanged.
     if (this != &src) {
-        //delete[] string;
-        //delete string;
-        len = src.len;
-        string = new char[len + 1];
+        // Equal stored lengths reuse the buffer, even if the text is now shorter.
+        if (len != src.len) {
+            delete[] string;
+            // On reallocation, the original uses strlen(src.string), not src.len.
+            len = static_cast<unsigned int>(strlen(src.string));
+            string = new char[len + 1];
+        }
         strcpy(string, src.string);
     }
     return *this;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

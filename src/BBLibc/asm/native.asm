@@ -3169,72 +3169,7 @@ l10003250 ENDP
 ;
 ;* Export: ??4B_Name@@QAEAAV0@ABV0@@Z, 0047
 ;
-l1000378E PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 00000000Ch
-           push esi
-           push edi
-           mov dword ptr [ebp-00Ch], ecx
-           mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [eax+004h]
-           cmp edx, dword ptr [ecx+004h]
-           je l100037EF
-           mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [eax]
-           mov dword ptr [ebp-004h], ecx
-           mov edx, dword ptr [ebp-004h]
-           push edx
-           call l100415C0; [BICRT.??3@YAXPAX@Z].
-           add esp, 000000004h
-           mov eax, dword ptr [ebp+008h]
-           mov edi, dword ptr [eax]
-           or ecx, 0FFFFFFFFh
-           xor eax, eax
-           repnz scasb
-           not ecx
-           add ecx, 0FFFFFFFFh
-           mov edx, dword ptr [ebp-00Ch]
-           mov dword ptr [edx+004h], ecx
-           mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [eax+004h]
-           add ecx, 000000001h
-           push ecx
-           call l100415E4; [BICRT.??2@YAPAXI@Z].
-           add esp, 000000004h
-           mov dword ptr [ebp-008h], eax
-           mov edx, dword ptr [ebp-00Ch]
-           mov eax, dword ptr [ebp-008h]
-           mov dword ptr [edx], eax
-;
-;* Jump:
-; 100037A5(C) 
-;
-l100037EF: mov ecx, dword ptr [ebp+008h]
-           mov edi, dword ptr [ecx]
-           mov edx, dword ptr [ebp-00Ch]
-           mov edx, dword ptr [edx]
-           or ecx, 0FFFFFFFFh
-           xor eax, eax
-           repnz scasb
-           not ecx
-           sub edi, ecx
-           mov esi, edi
-           mov eax, ecx
-           mov edi, edx
-           shr ecx, 002h
-           rep movsd
-           mov ecx, eax
-           and ecx, 000000003h
-           rep movsb
-           mov eax, dword ptr [ebp-00Ch]
-           pop edi
-           pop esi
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l1000378E ENDP
+           call l1000378E; Implemented in c++ code
 ;
 ;* Call:
 ; 10027E2F, 10027EAA, 10027F33, 10027FB2 
