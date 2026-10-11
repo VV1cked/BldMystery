@@ -120,12 +120,15 @@ unsigned int B_Name::operator ==(const char *str) const
 * Entry point:            0x10003643
 * VC++ mangling:          ??9B_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator !=(const B_Name &rhs) const
 {
-    return !(*this == rhs);
+    if (this->len != rhs.len)
+    {
+        return 1;
+    }
+    const int comparison = strcmp(this->string, rhs.string);
+    return static_cast<unsigned int>((comparison > 0) - (comparison < 0));
 }
-#endif
 
 
 /*
@@ -133,12 +136,11 @@ unsigned int B_Name::operator !=(const B_Name &rhs) const
 * Entry point:            0x100036C5
 * VC++ mangling:          ??9B_Name@@QBEIPBD@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator !=(const char *str) const
 {
-    return strcmp(string, str) != 0;
+    const int comparison = strcmp(this->string, str);
+    return static_cast<unsigned int>((comparison > 0) - (comparison < 0));
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

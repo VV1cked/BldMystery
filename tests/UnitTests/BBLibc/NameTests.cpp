@@ -150,6 +150,83 @@ TEST(NameTests, EqualityStopsAtNullWithEqualStoredLengths)
 }
 
 
+TEST(NameTests, InequalityEqualNames)
+{
+    const char *values[] = {"", "a", "ab", "abc", "Blade", "\x80\xFF"};
+    for (unsigned int i = 0; i < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        const B_Name name(values[i]);
+        const B_Name same(values[i]);
+        EXPECT_EQ(0u, name != same);
+        EXPECT_EQ(0u, name != values[i]);
+        EXPECT_EQ(0u, name != name);
+    }
+}
+
+
+TEST(NameTests, InequalityReturnsComparisonSignForEqualLengths)
+{
+    const B_Name name("abcd");
+    const char *others[] = {"xbcd", "axcd", "abxd", "abcx"};
+    for (unsigned int i = 0; i < sizeof(others) / sizeof(others[0]); ++i)
+    {
+        const B_Name other(others[i]);
+        EXPECT_EQ(0xFFFFFFFFu, name != other);
+        EXPECT_EQ(1u, other != name);
+        EXPECT_EQ(0xFFFFFFFFu, name != others[i]);
+        EXPECT_EQ(1u, other != "abcd");
+    }
+}
+
+
+TEST(NameTests, InequalityIsCaseSensitiveAndUsesUnsignedBytes)
+{
+    const char *values[] = {"A", "a", "\x7F", "\x80", "\xFF"};
+    for (unsigned int i = 0; i + 1 < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        const B_Name lower(values[i]);
+        const B_Name higher(values[i + 1]);
+        EXPECT_EQ(0xFFFFFFFFu, lower != higher);
+        EXPECT_EQ(1u, higher != lower);
+        EXPECT_EQ(0xFFFFFFFFu, lower != values[i + 1]);
+        EXPECT_EQ(1u, higher != values[i]);
+    }
+}
+
+
+TEST(NameTests, InequalityObjectReturnsOneForDifferentStoredLengths)
+{
+    const B_Name empty;
+    const B_Name name("a");
+    const B_Name longer("aa");
+    EXPECT_EQ(1u, empty != name);
+    EXPECT_EQ(1u, name != empty);
+    EXPECT_EQ(1u, name != longer);
+    EXPECT_EQ(1u, longer != name);
+    EXPECT_EQ(0xFFFFFFFFu, empty != "a");
+    EXPECT_EQ(0xFFFFFFFFu, name != "aa");
+
+    B_Name mutated("Blade");
+    const B_Name prefix("Bl");
+    mutated.String()[2] = '\0';
+    EXPECT_EQ(1u, mutated != prefix);
+    EXPECT_EQ(1u, prefix != mutated);
+    EXPECT_EQ(0u, mutated != "Bl");
+}
+
+
+TEST(NameTests, InequalityStopsAtNullWithEqualStoredLengths)
+{
+    B_Name name("Blade");
+    B_Name other("Blxyz");
+    name.String()[2] = '\0';
+    other.String()[2] = '\0';
+    EXPECT_EQ(0u, name != other);
+    EXPECT_EQ(0u, other != name);
+    EXPECT_EQ(0u, name != "Bl\0different tail");
+}
+
+
 TEST(NameTests, OrderingEqualNames)
 {
     const char *values[] = {"", "a", "ab", "abc", "Blade", "\x80\xFF"};

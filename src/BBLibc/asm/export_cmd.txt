@@ -20,8 +20,6 @@
 /EXPORT:?GetLast@B_List@@QAEPAVB_ListElement@@XZ=?GetLast@B_List@@QAEPAVB_ListElement@@XZ
 /EXPORT:??0B_List@@QAE@ABV0@@Z=??0B_List@@QAE@ABV0@@Z
 /EXPORT:??_FB_List@@QAEXXZ=??_FB_List@@QAEXXZ
-/EXPORT:??9B_Name@@QBEIABV0@@Z=??9B_Name@@QBEIABV0@@Z
-/EXPORT:??9B_Name@@QBEIPBD@Z=??9B_Name@@QBEIPBD@Z
 /EXPORT:??4B_Name@@QAEAAV0@ABV0@@Z=??4B_Name@@QAEAAV0@ABV0@@Z
 /EXPORT:?Right@B_Name@@QBE?AV1@I@Z=?Right@B_Name@@QBE?AV1@I@Z
 /EXPORT:?Left@B_Name@@QBE?AV1@I@Z=?Left@B_Name@@QBE?AV1@I@Z
