@@ -9749,24 +9749,7 @@ l10007F40 ENDP
 ;
 ;* Export: ??4B_MeshEdge@@QAEAAV0@ABV0@@Z, 0044
 ;
-l10007F70 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           push esi
-           push edi
-           mov dword ptr [ebp-004h], ecx
-           mov esi, dword ptr [ebp+008h]
-           mov ecx, 000000006h
-           mov edi, dword ptr [ebp-004h]
-           rep movsd
-           mov eax, dword ptr [ebp-004h]
-           pop edi
-           pop esi
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10007F70 ENDP
+           call l10007F70; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -78361,118 +78344,21 @@ l100321C8 ENDP
 ;
 ;* Export: ??0B_MeshEdge@@QAE@XZ, 0014
 ;
-l100321F0 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov dword ptr [eax+004h], 000000000h
-           mov ecx, dword ptr [ebp-004h]
-           mov dword ptr [ecx+008h], 000000000h
-           mov edx, dword ptr [ebp-004h]
-           mov dword ptr [edx+014h], 000000001h
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret
-l100321F0 ENDP
+           call l100321F0; Implemented in c++ code
 ;
 ;* Call:
 ; 100344F1 
 ;
 ;* Export: ??0B_MeshEdge@@QAE@III@Z, 0013
 ;
-l1003221C PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 00000000Ch
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+010h]
-           mov dword ptr [eax], ecx
-           mov edx, dword ptr [ebp-004h]
-           mov dword ptr [edx+014h], 000000001h
-           mov eax, dword ptr [ebp+008h]
-           cmp eax, dword ptr [ebp+00Ch]
-           jnb l10032247
-           mov ecx, dword ptr [ebp+008h]
-           mov dword ptr [ebp-008h], ecx
-           jmp l1003224D
-;
-;* Jump:
-; 1003223D(C) 
-;
-l10032247: mov edx, dword ptr [ebp+00Ch]
-           mov dword ptr [ebp-008h], edx
-;
-;* Jump:
-; 10032245(U) 
-;
-l1003224D: mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp-008h]
-           mov dword ptr [eax+004h], ecx
-           mov edx, dword ptr [ebp+008h]
-           cmp edx, dword ptr [ebp+00Ch]
-           jbe l10032266
-           mov eax, dword ptr [ebp+008h]
-           mov dword ptr [ebp-00Ch], eax
-           jmp l1003226C
-;
-;* Jump:
-; 1003225C(C) 
-;
-l10032266: mov ecx, dword ptr [ebp+00Ch]
-           mov dword ptr [ebp-00Ch], ecx
-;
-;* Jump:
-; 10032264(U) 
-;
-l1003226C: mov edx, dword ptr [ebp-004h]
-           mov eax, dword ptr [ebp-00Ch]
-           mov dword ptr [edx+008h], eax
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 0000Ch
-l1003221C ENDP
+           call l1003221C; Implemented in c++ code
 ;
 ;* Call:
 ; 10034535 
 ;
 ;* Export: ??8B_MeshEdge@@QBEIABV0@@Z, 0074
 ;
-l1003227E PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000008h
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [eax+004h]
-           cmp edx, dword ptr [ecx+004h]
-           jne l100322AC
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [eax+008h]
-           cmp edx, dword ptr [ecx+008h]
-           jne l100322AC
-           mov dword ptr [ebp-008h], 000000001h
-           jmp l100322B3
-;
-;* Jump:
-; 10032293(C), 100322A1(C) 
-;
-l100322AC: mov dword ptr [ebp-008h], 000000000h
-;
-;* Jump:
-; 100322AA(U) 
-;
-l100322B3: mov eax, dword ptr [ebp-008h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l1003227E ENDP
+           call l1003227E; Implemented in c++ code
 ;
 ;* Call:
 ; 1003D720 
