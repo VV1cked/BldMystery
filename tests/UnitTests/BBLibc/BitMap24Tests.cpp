@@ -4,6 +4,7 @@
 #include <BBLibc/BitMap24.h>
 #include <BBLibc/Color.h>
 #include <cstring>
+#include <new>
 
 
 TEST(BitMap24Tests, Fields)
@@ -79,4 +80,25 @@ TEST(BitMap24Tests, PixelAccessUsesRgbAndPreservesOutputOnFailure)
     EXPECT_EQ(1u, bitmap.GetPixelAt(0, 2, color));
     EXPECT_EQ(3, color.r); EXPECT_EQ(4, color.g); EXPECT_EQ(5, color.b);
     bitmap.data = nullptr; // The fixture lends stack storage; it does not transfer ownership.
+}
+
+TEST(BitMap24Tests, ClearReleasesDataAndZerosDimensions)
+{
+    B_BitMap24 bitmap;
+    bitmap.dimension1 = 2; bitmap.dimension2 = 3;
+    bitmap.data = ::operator new(18);
+    bitmap.Clear();
+    EXPECT_EQ(nullptr, bitmap.data);
+    EXPECT_EQ(0u, bitmap.dimension1); EXPECT_EQ(0u, bitmap.dimension2);
+    bitmap.Clear();
+    EXPECT_EQ(nullptr, bitmap.data);
+}
+
+TEST(BitMap24Tests, ClearZerosDimensionsEvenWhenDataIsNull)
+{
+    B_BitMap24 bitmap;
+    bitmap.dimension1 = 0xFFFFFFFFu; bitmap.dimension2 = 0x80000000u; bitmap.data = nullptr;
+    bitmap.Clear();
+    EXPECT_EQ(nullptr, bitmap.data);
+    EXPECT_EQ(0u, bitmap.dimension1); EXPECT_EQ(0u, bitmap.dimension2);
 }

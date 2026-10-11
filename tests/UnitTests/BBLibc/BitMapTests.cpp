@@ -2,6 +2,7 @@
 #include <Utils/FieldOffset.h>
 #include <bld_system.h>
 #include <BBLibc/BitMap.h>
+#include <BBLibc/BitMap24.h>
 #include <cstring>
 #include <new>
 
@@ -126,4 +127,55 @@ TEST(BitMapTests, UnknownTypeCopyLeavesDataStorageUntouched)
     EXPECT_EQ(nullptr, copy->pal);
     copy->data = nullptr; // Avoid freeing the intentionally untouched sentinel pointer.
     copy->~B_BitMap();
+}
+
+TEST(BitMapTests, ConversionSelectsFirstRgbByteOrCopiesAllChannels)
+{
+    B_BitMap24 source;
+    byte pixels[] = {1, 90, 80, 2, 70, 60, 3, 50, 40, 4, 30, 20};
+    source.dimension1 = source.dimension2 = 2; source.data = pixels;
+    B_BitMap single(B_BitMap::BitMapType2, source);
+    B_BitMap rgb(B_BitMap::BitMapType4, source);
+    const byte expected[] = {1, 2, 3, 4};
+    EXPECT_EQ(B_BitMap::BitMapType2, single.type);
+    EXPECT_EQ(B_BitMap::BitMapType4, rgb.type);
+    EXPECT_EQ(2u, single.dimension1); EXPECT_EQ(2u, single.dimension2);
+    EXPECT_EQ(2u, rgb.dimension1); EXPECT_EQ(2u, rgb.dimension2);
+    ASSERT_NE(nullptr, single.data); ASSERT_NE(nullptr, rgb.data);
+    EXPECT_EQ(0, std::memcmp(expected, single.data, sizeof(expected)));
+    EXPECT_EQ(0, std::memcmp(pixels, rgb.data, sizeof(pixels)));
+    EXPECT_NE(source.data, rgb.data);
+    static_cast<byte *>(rgb.data)[0] = 99;
+    EXPECT_EQ(1, pixels[0]);
+    EXPECT_EQ(nullptr, single.pal); EXPECT_EQ(nullptr, rgb.pal);
+    source.data = nullptr;
+}
+
+TEST(BitMapTests, UnsupportedConversionReturnsEmptyBitmapWithoutReadingPixels)
+{
+    B_BitMap24 source;
+    source.dimension1 = source.dimension2 = 0xFFFFFFFFu; source.data = nullptr;
+    const unsigned int types[] = {0, 1, 3, 5, 6, 0xFFFFFFFFu};
+    for (unsigned int type : types)
+    {
+        B_BitMap bitmap(static_cast<B_BitMap::BitMapType>(type), source);
+        EXPECT_EQ(0, static_cast<int>(bitmap.type));
+        EXPECT_EQ(0u, bitmap.dimension1); EXPECT_EQ(0u, bitmap.dimension2);
+        EXPECT_EQ(nullptr, bitmap.data); EXPECT_EQ(nullptr, bitmap.pal);
+    }
+}
+
+TEST(BitMapTests, ConversionPreservesDimensionsAndUsesWrappedCount)
+{
+    B_BitMap24 source;
+    byte pixels[] = {1, 2, 3, 4, 5, 6};
+    source.dimension1 = 0x80000001u; source.dimension2 = 2; source.data = pixels;
+    B_BitMap single(B_BitMap::BitMapType2, source), rgb(B_BitMap::BitMapType4, source);
+    EXPECT_EQ(source.dimension1, single.dimension1); EXPECT_EQ(2u, single.dimension2);
+    EXPECT_EQ(source.dimension1, rgb.dimension1); EXPECT_EQ(2u, rgb.dimension2);
+    ASSERT_NE(nullptr, single.data); ASSERT_NE(nullptr, rgb.data);
+    EXPECT_EQ(1, static_cast<byte *>(single.data)[0]);
+    EXPECT_EQ(4, static_cast<byte *>(single.data)[1]);
+    EXPECT_EQ(0, std::memcmp(pixels, rgb.data, sizeof(pixels)));
+    source.data = nullptr;
 }

@@ -1,5 +1,6 @@
 #define BBLIBC_LIB_EXPORT
 #include "BitMap.h"
+#include "BitMap24.h"
 #include "ODataFile.h"
 #include <new>
 #include <cstring>
@@ -65,11 +66,35 @@ B_BitMap::B_BitMap(const B_BitMap &src)
 * Entry point:            0x10008974
 * VC++ mangling:          ??0B_BitMap@@QAE@W4BitMapType@0@ABVB_BitMap24@@@Z
 */
-#ifndef BLD_NATIVE
 B_BitMap::B_BitMap(BitMapType arg_1, const B_BitMap24 &arg_2)
+    : pal(nullptr)
 {
+    // Original supports only types 2 and 4; all other codes produce an empty bitmap.
+    if (arg_1 != BitMapType2 && arg_1 != BitMapType4)
+    {
+        type = static_cast<BitMapType>(0);
+        dimension1 = dimension2 = 0;
+        data = nullptr;
+        return;
+    }
+    type = arg_1;
+    dimension1 = arg_2.dimension1;
+    dimension2 = arg_2.dimension2;
+    // Both pixel count and byte count wrap to 32 bits, without dimension validation.
+    const unsigned int count = dimension1 * dimension2;
+    const unsigned int size = count * (type == BitMapType2 ? 1u : 3u);
+    data = ::operator new(size);
+    const byte *source = static_cast<const byte *>(arg_2.data);
+    if (type == BitMapType2)
+    {
+        // Original keeps only the first RGB byte, rather than computing luminance.
+        byte *destination = static_cast<byte *>(data);
+        for (unsigned int i = 0; i < count; ++i, source += 3)
+            destination[i] = source[0];
+    }
+    else if (size)
+        std::memcpy(data, source, size);
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

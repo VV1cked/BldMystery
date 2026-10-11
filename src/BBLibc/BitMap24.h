@@ -77,13 +77,7 @@ public:
     * Entry point:            0x10006E20
     * VC++ mangling:          ?Clear@B_BitMap24@@QAEXXZ
     */
-#ifndef BLD_NATIVE
-    void Clear()
-    {
-    }
-#else
     void Clear();
-#endif
 
     /*
     * Module:                 BBLibc.dll

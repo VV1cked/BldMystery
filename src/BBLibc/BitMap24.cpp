@@ -2,6 +2,25 @@
 #include "BitMap24.h"
 #include "ODataFile.h"
 #include "Color.h"
+#include <new>
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10006E20
+* VC++ mangling:          ?Clear@B_BitMap24@@QAEXXZ
+*/
+void B_BitMap24::Clear()
+{
+    // Original uses scalar delete, clears data after release, then height and width.
+    // A null buffer still causes both dimensions to be cleared.
+    if (data)
+    {
+        ::operator delete(data);
+        data = nullptr;
+    }
+    dimension2 = 0;
+    dimension1 = 0;
+}
 
 /*
 * Module:                 BBLibc.dll
