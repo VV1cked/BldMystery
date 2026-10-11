@@ -104,3 +104,117 @@ TEST(ColorTests, ChainedColorsAndByteShareStreamPosition)
     EXPECT_EQ(6, readSecond.b);
     EXPECT_EQ(sizeof(expected), input.posInCacheBlock);
 }
+
+TEST(ColorTests, ComparisonsReturnBooleanForEachRgbChannel)
+{
+    B_Color color(0, 0x80, 0xFF);
+    const B_Color same(0, 0x80, 0xFF);
+    const B_Color different[] = {
+        B_Color(1, 0x80, 0xFF), B_Color(0, 0x7F, 0xFF), B_Color(0, 0x80, 0xFE)
+    };
+    EXPECT_EQ(1u, color == same);
+    EXPECT_EQ(0u, color != same);
+    EXPECT_EQ(1u, color == color);
+    EXPECT_EQ(0u, color != color);
+    for (const B_Color &other : different)
+    {
+        EXPECT_EQ(0u, color == other);
+        EXPECT_EQ(1u, color != other);
+    }
+}
+
+TEST(ColorTests, ComparisonsIgnorePaddingAndDerivedType)
+{
+    struct DerivedColor : B_Color {
+        void MakeCons() override {}
+    } derived;
+    B_Color base;
+    base.SetColor(255, 128, 0);
+    derived.SetColor(255, 128, 0);
+    reinterpret_cast<unsigned char *>(&base)[7] = 0xA5;
+    reinterpret_cast<unsigned char *>(&derived)[7] = 0x5A;
+    EXPECT_EQ(1u, base == derived);
+    EXPECT_EQ(1u, derived == base);
+    EXPECT_EQ(0u, base != derived);
+    EXPECT_EQ(0u, derived != base);
+}
+
+TEST(ColorTests, AdditionWrapsChannelsAndPreservesOperands)
+{
+    const B_Color left(255, 128, 1), right(1, 128, 254);
+    const B_Color sum = left + right;
+    EXPECT_EQ(0, sum.r);
+    EXPECT_EQ(0, sum.g);
+    EXPECT_EQ(255, sum.b);
+    EXPECT_EQ(255, left.r);
+    EXPECT_EQ(128, left.g);
+    EXPECT_EQ(1, left.b);
+    EXPECT_EQ(1, right.r);
+    EXPECT_EQ(128, right.g);
+    EXPECT_EQ(254, right.b);
+    const B_Color doubled = left + left;
+    EXPECT_EQ(254, doubled.r);
+    EXPECT_EQ(0, doubled.g);
+    EXPECT_EQ(2, doubled.b);
+}
+
+TEST(ColorTests, SetColorAndAdditionDoNotInvokeOperandMakeCons)
+{
+    struct DerivedColor : B_Color
+    {
+        DerivedColor() : calls(0) {}
+        void MakeCons() override { ++calls; }
+        unsigned int calls;
+    } left, right;
+    unsigned char before[sizeof(void *)];
+    std::memcpy(before, &left, sizeof(before));
+    reinterpret_cast<unsigned char *>(&left)[7] = 0xA5;
+    left.SetColor(255, 128, 0);
+    right.SetColor(1, 0, 255);
+    const B_Color sum = left + right;
+    EXPECT_EQ(0, sum.r);
+    EXPECT_EQ(128, sum.g);
+    EXPECT_EQ(255, sum.b);
+    EXPECT_EQ(0u, left.calls);
+    EXPECT_EQ(0u, right.calls);
+    EXPECT_EQ(0xA5, reinterpret_cast<unsigned char *>(&left)[7]);
+    EXPECT_EQ(0, std::memcmp(before, &left, sizeof(before)));
+}
+
+TEST(ColorTests, MakeConsLeavesEveryStoredByteValueUnchanged)
+{
+    for (unsigned int value = 0; value < 256; ++value)
+    {
+        B_Color color(static_cast<byte>(value), static_cast<byte>(255 - value),
+            static_cast<byte>(value ^ 0x80));
+        reinterpret_cast<unsigned char *>(&color)[7] = 0xA5;
+        unsigned char before[sizeof(B_Color)];
+        std::memcpy(before, &color, sizeof(before));
+        color.MakeCons();
+        EXPECT_EQ(0, std::memcmp(before, &color, sizeof(before)));
+    }
+}
+
+TEST(ColorTests, DistanceToReturnsSquaredDistance)
+{
+    B_Color first(10, 20, 30), second(13, 24, 30);
+    EXPECT_FLOAT_EQ(25.0F, first.DistanceTo(second));
+    EXPECT_FLOAT_EQ(25.0F, second.DistanceTo(first));
+    EXPECT_FLOAT_EQ(0.0F, first.DistanceTo(first));
+    B_Color black(0, 0, 0), white(255, 255, 255);
+    EXPECT_FLOAT_EQ(195075.0F, black.DistanceTo(white));
+    EXPECT_FLOAT_EQ(195075.0F, white.DistanceTo(black));
+}
+
+TEST(ColorTests, DistanceToUsesUnsignedChannelsAndPreservesObjects)
+{
+    B_Color first(0, 0x80, 0xFF), second(0xFF, 0x7F, 0);
+    reinterpret_cast<unsigned char *>(&first)[7] = 0xA5;
+    reinterpret_cast<unsigned char *>(&second)[7] = 0x5A;
+    unsigned char beforeFirst[sizeof(B_Color)], beforeSecond[sizeof(B_Color)];
+    std::memcpy(beforeFirst, &first, sizeof(beforeFirst));
+    std::memcpy(beforeSecond, &second, sizeof(beforeSecond));
+    EXPECT_FLOAT_EQ(130051.0F, first.DistanceTo(second));
+    EXPECT_EQ(0, std::memcmp(beforeFirst, &first, sizeof(beforeFirst)));
+    EXPECT_EQ(0, std::memcmp(beforeSecond, &second, sizeof(beforeSecond)));
+}
