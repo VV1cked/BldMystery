@@ -95,42 +95,21 @@ public:
     * Entry point:            0x10003100
     * VC++ mangling:          ?nElements@B_List@@QAEIXZ
     */
-#ifndef BLD_NATIVE
-    unsigned int nElements()
-    {
-        return 0;
-    }
-#else
     unsigned int nElements();
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x10003120
     * VC++ mangling:          ?GetFirst@B_List@@QAEPAVB_ListElement@@XZ
     */
-#ifndef BLD_NATIVE
-    B_ListElement *GetFirst()
-    {
-        return nullptr;
-    }
-#else
     B_ListElement *GetFirst();
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x10003140
     * VC++ mangling:          ?GetLast@B_List@@QAEPAVB_ListElement@@XZ
     */
-#ifndef BLD_NATIVE
-    B_ListElement *GetLast()
-    {
-        return nullptr;
-    }
-#else
     B_ListElement *GetLast();
-#endif
 
     /*
     * Module:                 BBLibc.dll

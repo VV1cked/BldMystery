@@ -129,12 +129,17 @@ B_ListElement *B_List::RemoveLast(unsigned int arg_1)
 * Entry point:            0x10002E0E
 * VC++ mangling:          ?GetAt@B_List@@QAEPAVB_ListElement@@I@Z
 */
-#ifndef BLD_NATIVE
 B_ListElement *B_List::GetAt(unsigned int arg_1)
 {
-    return nullptr;
+    // Original uses an unsigned count comparison and permits index == count.
+    // It follows next from offset 0x8 (named tail here), without checking intermediate links.
+    if (static_cast<unsigned int>(numElements) < arg_1)
+        return nullptr;
+    B_ListElement *element = tail;
+    for (unsigned int index = 0; index < arg_1; ++index)
+        element = element->next;
+    return element;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
@@ -142,36 +147,38 @@ B_ListElement *B_List::GetAt(unsigned int arg_1)
 * VC++ mangling:          ?Exists@B_List@@QAEIPBVB_ListElement@@@Z
 */
 
-#ifndef BLD_NATIVE
 unsigned int B_List::Exists(const B_ListElement *element)
 {
-    return false;
+    // Original scans links rather than checking the stored count or element's owner.
+    for (B_ListElement *current = tail; current != nullptr; current = current->next)
+        if (current == element)
+            return 1;
+    return 0;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002EE0
 * VC++ mangling:          ?GetList@B_ListElement@@QAEPAVB_List@@XZ
 */
-#ifndef BLD_NATIVE
 B_List *B_ListElement::GetList()
 {
-    return nullptr;
+    return list;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002F80
 * VC++ mangling:          ??4B_ListElement@@QAEAAV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_ListElement &B_ListElement::operator =(const B_ListElement &other)
 {
+    // Original shallow-copies all three links without detaching or relinking either node.
+    list = other.list;
+    next = other.next;
+    prev = other.prev;
     return *this;
 }
-#endif
 
 
 // B_List implementation
@@ -181,12 +188,42 @@ B_ListElement &B_ListElement::operator =(const B_ListElement &other)
 * Entry point:            0x100030A0
 * VC++ mangling:          ??0B_List@@QAE@PAVB_ListElement@@@Z
 */
-#ifndef BLD_NATIVE
-B_List::B_List(B_ListElement *element)
+B_List::B_List(B_ListElement *element) : numElements(0), tail(nullptr), head(nullptr)
 {
-
+    // Original ignores element entirely and always constructs an empty list.
 }
-#endif
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10003100
+* VC++ mangling:          ?nElements@B_List@@QAEIXZ
+*/
+unsigned int B_List::nElements()
+{
+    // Original returns the stored 32-bit count unchanged, even if its signed value is negative.
+    return static_cast<unsigned int>(numElements);
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10003120
+* VC++ mangling:          ?GetFirst@B_List@@QAEPAVB_ListElement@@XZ
+*/
+B_ListElement *B_List::GetFirst()
+{
+    // Despite the field name, original GetFirst reads tail at offset 0x8.
+    return tail;
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10003140
+* VC++ mangling:          ?GetLast@B_List@@QAEPAVB_ListElement@@XZ
+*/
+B_ListElement *B_List::GetLast()
+{
+    return head;
+}
 
 
 /*
@@ -194,9 +231,8 @@ B_List::B_List(B_ListElement *element)
 * Entry point:            0x10003160
 * VC++ mangling:          ??0B_List@@QAE@ABV0@@Z
 */
-#ifndef BLD_NATIVE
-B_List::B_List(B_List const&)
+B_List::B_List(B_List const &other)
+    : numElements(other.numElements), tail(other.tail), head(other.head)
 {
-
+    // Original shallow-copies the list view; node links and their owner pointers are unchanged.
 }
-#endif

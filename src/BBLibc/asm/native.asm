@@ -2364,100 +2364,11 @@ l10002D5D ENDP
 ;
 ;* Export: ?GetAt@B_List@@QAEPAVB_ListElement@@I@Z, 00B7
 ;
-l10002E0E PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 00000000Ch
-           mov dword ptr [ebp-00Ch], ecx
-           mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [eax+004h]
-           cmp ecx, dword ptr [ebp+008h]
-           jnb l10002E26
-           xor eax, eax
-           jmp l10002E57
-;
-;* Jump:
-; 10002E20(C) 
-;
-l10002E26: mov edx, dword ptr [ebp-00Ch]
-           mov eax, dword ptr [edx+008h]
-           mov dword ptr [ebp-008h], eax
-           mov dword ptr [ebp-004h], 000000000h
-           jmp l10002E41
-;
-;* Jump:
-; 10002E52(U) 
-;
-l10002E38: mov ecx, dword ptr [ebp-004h]
-           add ecx, 000000001h
-           mov dword ptr [ebp-004h], ecx
-;
-;* Jump:
-; 10002E36(U) 
-;
-l10002E41: mov edx, dword ptr [ebp-004h]
-           cmp edx, dword ptr [ebp+008h]
-           jnb l10002E54
-           mov eax, dword ptr [ebp-008h]
-           mov ecx, dword ptr [eax+008h]
-           mov dword ptr [ebp-008h], ecx
-           jmp l10002E38
-;
-;* Jump:
-; 10002E47(C) 
-;
-l10002E54: mov eax, dword ptr [ebp-008h]
-;
-;* Jump:
-; 10002E24(U) 
-;
-l10002E57: mov esp, ebp
-           pop ebp
-           ret 00004h
-l10002E0E ENDP
+           call l10002E0E; Implemented in c++ code
 ;
 ;* Export: ?Exists@B_List@@QAEIPBVB_ListElement@@@Z, 00B4
 ;
-l10002E5D PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000008h
-           mov dword ptr [ebp-008h], ecx
-           mov eax, dword ptr [ebp-008h]
-           mov ecx, dword ptr [eax+008h]
-           mov dword ptr [ebp-004h], ecx
-;
-;* Jump:
-; 10002E8D(U) 
-;
-l10002E6F: cmp dword ptr [ebp-004h], 000000000h
-           je l10002E8F
-           mov edx, dword ptr [ebp-004h]
-           cmp edx, dword ptr [ebp+008h]
-           jne l10002E84
-           mov eax, 000000001h
-           jmp l10002E91
-;
-;* Jump:
-; 10002E7B(C) 
-;
-l10002E84: mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [eax+008h]
-           mov dword ptr [ebp-004h], ecx
-           jmp l10002E6F
-;
-;* Jump:
-; 10002E73(C) 
-;
-l10002E8F: xor eax, eax
-;
-;* Jump:
-; 10002E82(U) 
-;
-l10002E91: mov esp, ebp
-           pop ebp
-           ret 00004h
-l10002E5D ENDP
+           call l10002E5D; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2487,17 +2398,7 @@ l10002E5D ENDP
 ;
 ;* Export: ?GetList@B_ListElement@@QAEPAVB_List@@XZ, 00C4
 ;
-l10002EE0 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov eax, dword ptr [eax+004h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10002EE0 ENDP
+           call l10002EE0; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2565,28 +2466,7 @@ l10002EE0 ENDP
 ;
 ;* Export: ??4B_ListElement@@QAEAAV0@ABV0@@Z, 0043
 ;
-l10002F80 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [ecx+004h]
-           mov dword ptr [eax+004h], edx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [ecx+008h]
-           mov dword ptr [eax+008h], edx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [ecx+00Ch]
-           mov dword ptr [eax+00Ch], edx
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10002F80 ENDP
+           call l10002F80; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2725,27 +2605,7 @@ l10002FF0 ENDP
 ;
 ;* Export: ??0B_List@@QAE@PAVB_ListElement@@@Z, 0010
 ;
-l100030A0 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov dword ptr [eax+004h], 000000000h
-           mov ecx, dword ptr [ebp-004h]
-           mov dword ptr [ecx+008h], 000000000h
-           mov edx, dword ptr [ebp-004h]
-           mov dword ptr [edx+00Ch], 000000000h
-           mov eax, dword ptr [ebp-004h]
-;
-;* String: "P2"
-;
-           mov dword ptr [eax], offset g10042194
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l100030A0 ENDP
+           call l100030A0; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2776,17 +2636,7 @@ l100030A0 ENDP
 ;
 ;* Export: ?nElements@B_List@@QAEIXZ, 011F
 ;
-l10003100 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov eax, dword ptr [eax+004h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10003100 ENDP
+           call l10003100; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2806,17 +2656,7 @@ l10003100 ENDP
 ;
 ;* Export: ?GetFirst@B_List@@QAEPAVB_ListElement@@XZ, 00C0
 ;
-l10003120 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov eax, dword ptr [eax+008h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10003120 ENDP
+           call l10003120; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2836,17 +2676,7 @@ l10003120 ENDP
 ;
 ;* Export: ?GetLast@B_List@@QAEPAVB_ListElement@@XZ, 00C3
 ;
-l10003140 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov eax, dword ptr [eax+00Ch]
-           mov esp, ebp
-           pop ebp
-           ret
-l10003140 ENDP
+           call l10003140; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -2866,33 +2696,7 @@ l10003140 ENDP
 ;
 ;* Export: ??0B_List@@QAE@ABV0@@Z, 000F
 ;
-l10003160 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [ecx+004h]
-           mov dword ptr [eax+004h], edx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [ecx+008h]
-           mov dword ptr [eax+008h], edx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [ecx+00Ch]
-           mov dword ptr [eax+00Ch], edx
-           mov eax, dword ptr [ebp-004h]
-;
-;* String: "P2"
-;
-           mov dword ptr [eax], offset g10042194
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10003160 ENDP
+           call l10003160; Implemented in c++ code
 ;
            int 03h
            int 03h

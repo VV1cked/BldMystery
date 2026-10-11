@@ -10,15 +10,6 @@
 /EXPORT:?Remove@B_List@@QAEIPAVB_ListElement@@I@Z=?Remove@B_List@@QAEIPAVB_ListElement@@I@Z
 /EXPORT:?RemoveFirst@B_List@@QAEPAVB_ListElement@@I@Z=?RemoveFirst@B_List@@QAEPAVB_ListElement@@I@Z
 /EXPORT:?RemoveLast@B_List@@QAEPAVB_ListElement@@I@Z=?RemoveLast@B_List@@QAEPAVB_ListElement@@I@Z
-/EXPORT:?GetAt@B_List@@QAEPAVB_ListElement@@I@Z=?GetAt@B_List@@QAEPAVB_ListElement@@I@Z
-/EXPORT:?Exists@B_List@@QAEIPBVB_ListElement@@@Z=?Exists@B_List@@QAEIPBVB_ListElement@@@Z
-/EXPORT:?GetList@B_ListElement@@QAEPAVB_List@@XZ=?GetList@B_ListElement@@QAEPAVB_List@@XZ
-/EXPORT:??4B_ListElement@@QAEAAV0@ABV0@@Z=??4B_ListElement@@QAEAAV0@ABV0@@Z
-/EXPORT:??0B_List@@QAE@PAVB_ListElement@@@Z=??0B_List@@QAE@PAVB_ListElement@@@Z
-/EXPORT:?nElements@B_List@@QAEIXZ=?nElements@B_List@@QAEIXZ
-/EXPORT:?GetFirst@B_List@@QAEPAVB_ListElement@@XZ=?GetFirst@B_List@@QAEPAVB_ListElement@@XZ
-/EXPORT:?GetLast@B_List@@QAEPAVB_ListElement@@XZ=?GetLast@B_List@@QAEPAVB_ListElement@@XZ
-/EXPORT:??0B_List@@QAE@ABV0@@Z=??0B_List@@QAE@ABV0@@Z
 /EXPORT:??_FB_List@@QAEXXZ=??_FB_List@@QAEXXZ
 /EXPORT:?Save@B_Resource@@SAXAAVB_ODataFile@@PBV1@@Z=?Save@B_Resource@@SAXAAVB_ODataFile@@PBV1@@Z
 /EXPORT:?Load@B_Resource@@SAPAV1@AAVB_IDataFile@@G@Z=?Load@B_Resource@@SAPAV1@AAVB_IDataFile@@G@Z
