@@ -1,6 +1,8 @@
 #define BBLIBC_LIB_EXPORT
 #include "BitMap.h"
 #include "ODataFile.h"
+#include <new>
+#include <cstring>
 
 
 /*
@@ -8,33 +10,55 @@
 * Entry point:            0x100085F0
 * VC++ mangling:          ??0B_BitMap@@QAE@XZ
 */
-#ifndef BLD_NATIVE
 B_BitMap::B_BitMap()
+    : type(static_cast<BitMapType>(0)), dimension1(0), dimension2(0), data(nullptr), pal(nullptr)
 {
+    // Original initializes all five fields to zero, including the otherwise unnamed type 0.
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10008639
 * VC++ mangling:          ??0B_BitMap@@QAE@W4BitMapType@0@IIPBVB_Pal@@@Z
 */
-#ifndef BLD_NATIVE
-B_BitMap::B_BitMap(BitMapType type, unsigned int, unsigned int, const B_Pal *pal)
+B_BitMap::B_BitMap(BitMapType type, unsigned int width, unsigned int height, const B_Pal *palette)
+    : type(type), dimension1(width), dimension2(height)
 {
+    // Original wraps the allocation size to 32 bits and does not initialize pixel bytes.
+    // It still requests an allocation when the computed size is zero.
+    const unsigned int size = width * height * static_cast<unsigned int>(BytesPerTexel());
+    data = ::operator new(size);
+    // The palette is copied independently of bitmap type; null stays null.
+    pal = nullptr;
+    if (palette)
+    {
+        void *storage = ::operator new(sizeof(B_Pal));
+        pal = storage ? new (storage) B_Pal(*palette) : nullptr;
+    }
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x100086E3
 * VC++ mangling:          ??0B_BitMap@@QAE@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_BitMap::B_BitMap(const B_BitMap &src)
+    : type(src.type), dimension1(src.dimension1), dimension2(src.dimension2), pal(nullptr)
 {
+    // Original copies palettes only for types 1 and 3, requiring a non-null source palette.
+    // For unknown types it leaves data untouched, even though the destructor later frees it.
+    const unsigned int code = static_cast<unsigned int>(type);
+    if (code < 1u || code > 5u) return;
+    if (code == 1u || code == 3u)
+    {
+        void *storage = ::operator new(sizeof(B_Pal));
+        pal = storage ? new (storage) B_Pal(*src.pal) : nullptr;
+    }
+    const unsigned int size = dimension1 * dimension2 * static_cast<unsigned int>(BytesPerTexel());
+    data = ::operator new(size);
+    // Original copies exactly the wrapped byte count and does not check allocation failure.
+    if (size) std::memcpy(data, src.data, size);
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
@@ -95,8 +119,10 @@ B_IDataFile &operator >>(B_IDataFile &file, B_BitMap &bitMap)
 * Entry point:            0x10008FDA
 * VC++ mangling:          ??1B_BitMap@@UAE@XZ
 */
-#ifndef BLD_NATIVE
 B_BitMap::~B_BitMap()
 {
+    // Original uses scalar deallocation for data, then palette, without clearing fields.
+    // B_Pal has no destructor work; its raw allocation is released directly.
+    if (data) ::operator delete(data);
+    if (pal) ::operator delete(pal);
 }
-#endif
