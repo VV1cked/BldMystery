@@ -148,3 +148,87 @@ TEST(NameTests, EqualityStopsAtNullWithEqualStoredLengths)
     EXPECT_EQ(1u, other == name);
     EXPECT_EQ(1u, name == "Bl\0different tail");
 }
+
+
+TEST(NameTests, OrderingEqualNames)
+{
+    const char *values[] = {"", "a", "ab", "abc", "Blade", "\x80\xFF"};
+    for (unsigned int i = 0; i < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        const B_Name name(values[i]);
+        const B_Name same(values[i]);
+        EXPECT_EQ(0u, name < same);
+        EXPECT_EQ(0u, name > same);
+        EXPECT_EQ(0u, name < name);
+        EXPECT_EQ(0u, name > name);
+    }
+}
+
+
+TEST(NameTests, OrderingEmptyNamesAndPrefixes)
+{
+    const char *values[] = {"", "a", "ab", "abc", "abcd"};
+    for (unsigned int i = 0; i + 1 < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        const B_Name shorter(values[i]);
+        const B_Name longer(values[i + 1]);
+        EXPECT_EQ(1u, shorter < longer);
+        EXPECT_EQ(0u, shorter > longer);
+        EXPECT_EQ(1u, longer > shorter);
+        EXPECT_EQ(0u, longer < shorter);
+    }
+}
+
+
+TEST(NameTests, OrderingUsesFirstDifferentByte)
+{
+    const B_Name name("abcd");
+    const char *others[] = {"xbcd", "axcd", "abxd", "abcx"};
+    for (unsigned int i = 0; i < sizeof(others) / sizeof(others[0]); ++i)
+    {
+        const B_Name other(others[i]);
+        EXPECT_EQ(1u, name < other);
+        EXPECT_EQ(0u, name > other);
+        EXPECT_EQ(1u, other > name);
+        EXPECT_EQ(0u, other < name);
+    }
+}
+
+
+TEST(NameTests, OrderingIsCaseSensitiveAndUsesUnsignedBytes)
+{
+    const char *values[] = {"A", "a", "\x7F", "\x80", "\xFF"};
+    for (unsigned int i = 0; i + 1 < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        const B_Name lower(values[i]);
+        const B_Name higher(values[i + 1]);
+        EXPECT_EQ(1u, lower < higher);
+        EXPECT_EQ(0u, lower > higher);
+        EXPECT_EQ(1u, higher > lower);
+        EXPECT_EQ(0u, higher < lower);
+    }
+}
+
+
+TEST(NameTests, OrderingIgnoresStoredLengthAndStopsAtNull)
+{
+    B_Name name("Blade");
+    const B_Name prefix("Bl");
+    name.String()[2] = '\0';
+    EXPECT_EQ(0u, name < prefix);
+    EXPECT_EQ(0u, name > prefix);
+    EXPECT_EQ(0u, prefix < name);
+    EXPECT_EQ(0u, prefix > name);
+
+    B_Name other("Blxyz");
+    other.String()[2] = '\0';
+    EXPECT_EQ(0u, name < other);
+    EXPECT_EQ(0u, name > other);
+
+    const B_Name shortName("z");
+    const B_Name longName("aa");
+    EXPECT_EQ(1u, shortName > longName);
+    EXPECT_EQ(1u, longName < shortName);
+    EXPECT_EQ(0u, shortName < longName);
+    EXPECT_EQ(0u, longName > shortName);
+}

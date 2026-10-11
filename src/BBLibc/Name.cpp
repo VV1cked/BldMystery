@@ -72,12 +72,10 @@ char * const B_Name::String() const
 * Entry point:            0x10003467
 * VC++ mangling:          ??OB_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator >(const B_Name &rhs) const
 {
-    return 0;
+    return strcmp(this->string, rhs.string) > 0;
 }
-#endif
 
 
 /*
@@ -85,12 +83,10 @@ unsigned int B_Name::operator >(const B_Name &rhs) const
 * Entry point:            0x100034DA
 * VC++ mangling:          ??MB_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator <(const B_Name &rhs) const
 {
-    return 0;
+    return strcmp(this->string, rhs.string) < 0;
 }
-#endif
 
 
 /*
