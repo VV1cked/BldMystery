@@ -227,6 +227,120 @@ TEST(NameTests, InequalityStopsAtNullWithEqualStoredLengths)
 }
 
 
+TEST(NameTests, AppendReturnsDestinationAndConcatenatesText)
+{
+    B_Name name("Bl");
+    const B_Name suffix("ade");
+    EXPECT_EQ(&name, &(name += suffix));
+    EXPECT_STREQ("Blade", name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_EQ(&name, &(name += "!"));
+    EXPECT_STREQ("Blade!", name.String());
+    EXPECT_EQ(6u, name.Length());
+    EXPECT_EQ(&name, &(name += '?'));
+    EXPECT_STREQ("Blade!?", name.String());
+    EXPECT_EQ(7u, name.Length());
+    EXPECT_STREQ("ade", suffix.String());
+}
+
+
+TEST(NameTests, AppendEmptyTextStillReallocates)
+{
+    B_Name name("Blade");
+    const B_Name empty;
+    char *buffer = name.String();
+    name += empty;
+    EXPECT_NE(buffer, name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("Blade", name.String());
+    buffer = name.String();
+    name += "";
+    EXPECT_NE(buffer, name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("Blade", name.String());
+    B_Name emptyName;
+    emptyName += "";
+    EXPECT_EQ(0u, emptyName.Length());
+    EXPECT_STREQ("", emptyName.String());
+    emptyName += 'x';
+    EXPECT_EQ(1u, emptyName.Length());
+    EXPECT_STREQ("x", emptyName.String());
+}
+
+
+TEST(NameTests, AppendUsesStoredLengthsButCopiesTextUpToNull)
+{
+    B_Name source("Sword");
+    source.String()[1] = '\0';
+    B_Name objectTarget("Blade"), stringTarget("Blade");
+    objectTarget.String()[2] = '\0';
+    stringTarget.String()[2] = '\0';
+    objectTarget += source;
+    stringTarget += source.String();
+    EXPECT_STREQ("BlS", objectTarget.String());
+    EXPECT_STREQ("BlS", stringTarget.String());
+    EXPECT_EQ(10u, objectTarget.Length());
+    EXPECT_EQ(6u, stringTarget.Length());
+    EXPECT_EQ(5u, source.Length());
+    EXPECT_STREQ("S", source.String());
+}
+
+
+TEST(NameTests, AppendCharacterUsesStoredEndAfterEarlyNull)
+{
+    B_Name name("Blade");
+    name.String()[2] = '\0';
+    name += 'x';
+    EXPECT_EQ(6u, name.Length());
+    EXPECT_STREQ("Bl", name.String());
+    EXPECT_EQ('x', name.String()[5]);
+    EXPECT_EQ('\0', name.String()[6]);
+    // The gap after the early NUL is uninitialized in the original allocation.
+}
+
+
+TEST(NameTests, AppendNullCharacterStillIncreasesStoredLength)
+{
+    B_Name name("Blade");
+    char *buffer = name.String();
+    name += '\0';
+    EXPECT_NE(buffer, name.String());
+    EXPECT_EQ(6u, name.Length());
+    EXPECT_STREQ("Blade", name.String());
+    EXPECT_EQ('\0', name.String()[5]);
+    EXPECT_EQ('\0', name.String()[6]);
+}
+
+
+TEST(NameTests, AppendSupportsSelfAndAliasedStringBuffers)
+{
+    B_Name objectTarget("Blade"), stringTarget("Blade"), suffixTarget("Blade");
+    objectTarget += objectTarget;
+    stringTarget += stringTarget.String();
+    suffixTarget += suffixTarget.String() + 2;
+    EXPECT_STREQ("BladeBlade", objectTarget.String());
+    EXPECT_STREQ("BladeBlade", stringTarget.String());
+    EXPECT_STREQ("Bladeade", suffixTarget.String());
+    EXPECT_EQ(10u, objectTarget.Length());
+    EXPECT_EQ(10u, stringTarget.Length());
+    EXPECT_EQ(8u, suffixTarget.Length());
+}
+
+
+TEST(NameTests, AppendPreservesHighBytesAndIndependentOwnership)
+{
+    B_Name name("\x80");
+    B_Name source("\xFF");
+    name += source;
+    name += "\x7F";
+    name += static_cast<char>(0x81);
+    EXPECT_EQ(4u, name.Length());
+    EXPECT_STREQ("\x80\xFF\x7F\x81", name.String());
+    source.String()[0] = 'x';
+    EXPECT_STREQ("\x80\xFF\x7F\x81", name.String());
+}
+
+
 TEST(NameTests, ConcatenationPreservesExtraStoredLength)
 {
     const B_Name left("Bl"), right("ade");

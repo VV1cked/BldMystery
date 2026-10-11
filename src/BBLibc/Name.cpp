@@ -323,12 +323,18 @@ B_Name operator +(const char *str, const B_Name &bName)
 * Entry point:            0x10003C70
 * VC++ mangling:          ??YB_Name@@QAEABV0@PBD@Z
 */
-#ifndef BLD_NATIVE
 B_Name const &B_Name::operator +=(const char *str)
 {
+    // Original always reallocates, even for empty text, and retains stale length.
+    len += static_cast<unsigned int>(strlen(str));
+    char *result = new char[len + 1];
+    strcpy(result, string);
+    // Keep the old buffer alive until copying finishes: str may point into it.
+    strcat(result, str);
+    delete[] string;
+    string = result;
     return *this;
 }
-#endif
 
 
 /*
@@ -336,12 +342,20 @@ B_Name const &B_Name::operator +=(const char *str)
 * Entry point:            0x10003D30
 * VC++ mangling:          ??YB_Name@@QAEABV0@D@Z
 */
-#ifndef BLD_NATIVE
 const B_Name &B_Name::operator+=(char c)
 {
+    // Even a NUL character increases stored length and forces reallocation.
+    ++len;
+    char *result = new char[len + 1];
+    strcpy(result, string);
+    // Use the stored end, not strlen: an earlier NUL can hide the appended byte.
+    // Padding between that NUL and the appended byte remains uninitialized.
+    result[len - 1] = c;
+    result[len] = '\0';
+    delete[] string;
+    string = result;
     return *this;
 }
-#endif
 
 
 /*
@@ -349,12 +363,18 @@ const B_Name &B_Name::operator+=(char c)
 * Entry point:            0x10003DCE
 * VC++ mangling:          ??YB_Name@@QAEABV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Name const &B_Name::operator +=(const B_Name &other)
 {
+    // Add stored lengths without the extra byte used by the free operator +.
+    len += other.len;
+    char *result = new char[len + 1];
+    strcpy(result, string);
+    // Delay replacing the buffer so self-append copies the original text twice.
+    strcat(result, other.string);
+    delete[] string;
+    string = result;
     return *this;
 }
-#endif
 
 
 /*
