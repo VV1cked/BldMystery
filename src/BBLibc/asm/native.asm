@@ -3294,64 +3294,21 @@ l10003250 ENDP
 ;
 ;* Export: ??0B_Resource@@QAE@XZ, 002B
 ;
-l10003EBA PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov ecx, dword ptr [ebp-004h]
-           call l100039E5
-           mov eax, dword ptr [ebp-004h]
-           mov dword ptr [eax], offset g10042198
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10003EBA ENDP
+           call l10003EBA; Implemented in c++ code
 ;
 ;* Call:
 ; 1000834E, 1000852E 
 ;
 ;* Export: ??0B_Resource@@QAE@ABVB_Name@@@Z, 002A
 ;
-l10003ED9 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+008h]
-           push eax
-           mov ecx, dword ptr [ebp-004h]
-           call l10003A07
-           mov ecx, dword ptr [ebp-004h]
-           mov dword ptr [ecx], offset g10042198
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10003ED9 ENDP
+           call l10003ED9; Implemented in c++ code
 ;
 ;* Call:
 ; 1000675A, 100067D3, 100067FE, 10006C85, 100079AB, 10007BEB, 100384C1 
 ;
 ;* Export: ??1B_Resource@@UAE@XZ, 003B
 ;
-l10003EFE PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov dword ptr [eax], offset g10042198
-           mov ecx, dword ptr [ebp-004h]
-           mov dword ptr [ecx], offset g1004217C
-           mov ecx, dword ptr [ebp-004h]
-           add ecx, 000000004h
-           call l100039BA
-           mov esp, ebp
-           pop ebp
-           ret
-l10003EFE ENDP
+           call l10003EFE; Implemented in c++ code
 ;
 ;* Export: ?Save@B_Resource@@SAXAAVB_ODataFile@@PBV1@@Z, 0103
 ;

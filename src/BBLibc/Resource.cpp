@@ -40,33 +40,30 @@ B_ResourceManager *GetResourceManager()
 * Entry point:            0x10003EBA
 * VC++ mangling:          ??0B_Resource@@QAE@XZ
 */
-#ifndef BLD_NATIVE
-B_Resource::B_Resource()
+B_Resource::B_Resource() : B_NamedObj()
 {
+    // Original initializes the name and vtable only; data is left untouched.
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10003ED9
 * VC++ mangling:          ??0B_Resource@@QAE@ABVB_Name@@@Z
 */
-#ifndef BLD_NATIVE
-B_Resource::B_Resource(const B_Name &arg_1)
+B_Resource::B_Resource(const B_Name &arg_1) : B_NamedObj(arg_1)
 {
+    // Original copies the name using B_Name's stored-length rules, leaving data untouched.
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10003EFE
 * VC++ mangling:          ??1B_Resource@@UAE@XZ
 */
-#ifndef BLD_NATIVE
 B_Resource::~B_Resource()
 {
+    // Original destroys the inherited name only; it neither frees nor clears data.
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
