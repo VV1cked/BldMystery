@@ -20,8 +20,6 @@
 /EXPORT:?GetLast@B_List@@QAEPAVB_ListElement@@XZ=?GetLast@B_List@@QAEPAVB_ListElement@@XZ
 /EXPORT:??0B_List@@QAE@ABV0@@Z=??0B_List@@QAE@ABV0@@Z
 /EXPORT:??_FB_List@@QAEXXZ=??_FB_List@@QAEXXZ
-/EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_Name@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_Name@@@Z
-/EXPORT:??6@YAAAVB_ODataFile@@AAV0@ABVB_Name@@@Z=??6@YAAAVB_ODataFile@@AAV0@ABVB_Name@@@Z
 /EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_NamedObj@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_NamedObj@@@Z
 /EXPORT:??6@YAAAVB_ODataFile@@AAV0@ABVB_NamedObj@@@Z=??6@YAAAVB_ODataFile@@AAV0@ABVB_NamedObj@@@Z
 /EXPORT:??0B_Resource@@QAE@XZ=??0B_Resource@@QAE@XZ

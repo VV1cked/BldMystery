@@ -1,8 +1,22 @@
 #include <gtest/gtest.h>
 #include <Utils/FieldOffset.h>
 #include <bld_system.h>
+#include <fcntl.h>
+#include <cstring>
 #define private public
 #include <BBLibc/Name.h>
+#include <BBLibc/IDataFile.h>
+#include <BBLibc/ODataFile.h>
+#undef private
+
+
+static void SetNameInputCache(B_IDataFile &file, const void *data, unsigned int size)
+{
+    file.file_size = size;
+    file.cacheBlockStartPos = 0;
+    file.posInCacheBlock = 0;
+    memcpy(file.fileCache, data, size);
+}
 
 
 TEST(NameTests, SizeOf)
@@ -224,6 +238,120 @@ TEST(NameTests, InequalityStopsAtNullWithEqualStoredLengths)
     EXPECT_EQ(0u, name != other);
     EXPECT_EQ(0u, other != name);
     EXPECT_EQ(0u, name != "Bl\0different tail");
+}
+
+
+TEST(NameTests, SerializationWritesLengthAndBytesWithoutTerminator)
+{
+    B_ODataFile file("NUL", _O_BINARY);
+    ASSERT_NE(0u, file.OK());
+    const B_Name name("Blade");
+    const unsigned char expected[] = {5, 0, 0, 0, 'B', 'l', 'a', 'd', 'e'};
+    EXPECT_EQ(&file, &(file << name));
+    ASSERT_EQ(sizeof(expected), file.posInCacheBlock);
+    EXPECT_EQ(0, memcmp(expected, file.fileCache, sizeof(expected)));
+}
+
+
+TEST(NameTests, SerializationPreservesBytesAfterEmbeddedNull)
+{
+    B_ODataFile file("NUL", _O_BINARY);
+    ASSERT_NE(0u, file.OK());
+    B_Name name("Blade");
+    name.String()[2] = '\0';
+    const unsigned char expected[] = {5, 0, 0, 0, 'B', 'l', 0, 'd', 'e'};
+    file << name;
+    ASSERT_EQ(sizeof(expected), file.posInCacheBlock);
+    EXPECT_EQ(0, memcmp(expected, file.fileCache, sizeof(expected)));
+}
+
+
+TEST(NameTests, SerializationChainsEmptyAndHighByteNames)
+{
+    B_ODataFile file("NUL", _O_BINARY);
+    ASSERT_NE(0u, file.OK());
+    const B_Name empty, bytes("\x80\xFF");
+    const unsigned char expected[] = {0, 0, 0, 0, 2, 0, 0, 0, 0x80, 0xFF};
+    EXPECT_EQ(&file, &(file << empty << bytes));
+    ASSERT_EQ(sizeof(expected), file.posInCacheBlock);
+    EXPECT_EQ(0, memcmp(expected, file.fileCache, sizeof(expected)));
+}
+
+
+TEST(NameTests, DeserializationReusesEqualLengthBuffer)
+{
+    const unsigned char encoded[] = {5, 0, 0, 0, 'S', 'w', 'o', 'r', 'd'};
+    B_IDataFile file;
+    SetNameInputCache(file, encoded, sizeof(encoded));
+    B_Name name("Blade");
+    char *buffer = name.String();
+    EXPECT_EQ(&file, &(file >> name));
+    EXPECT_EQ(buffer, name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("Sword", name.String());
+    EXPECT_EQ(sizeof(encoded), file.posInCacheBlock);
+}
+
+
+TEST(NameTests, DeserializationResizesAndPreservesEmbeddedNull)
+{
+    const unsigned char encoded[] = {4, 0, 0, 0, 'A', 0, 0x80, 0xFF};
+    B_IDataFile file;
+    SetNameInputCache(file, encoded, sizeof(encoded));
+    B_Name name("Blade");
+    file >> name;
+    EXPECT_EQ(4u, name.Length());
+    EXPECT_EQ(0, memcmp(encoded + 4, name.String(), 4));
+    EXPECT_EQ('\0', name.String()[4]);
+    EXPECT_STREQ("A", name.String());
+}
+
+
+TEST(NameTests, DeserializationChainsNamesAndHandlesZeroLength)
+{
+    const unsigned char encoded[] = {2, 0, 0, 0, 'B', 'l', 0, 0, 0, 0};
+    B_IDataFile file;
+    SetNameInputCache(file, encoded, sizeof(encoded));
+    B_Name first, second("Blade");
+    EXPECT_EQ(&file, &(file >> first >> second));
+    EXPECT_EQ(2u, first.Length());
+    EXPECT_STREQ("Bl", first.String());
+    EXPECT_EQ(0u, second.Length());
+    EXPECT_STREQ("", second.String());
+    EXPECT_EQ(sizeof(encoded), file.posInCacheBlock);
+}
+
+
+TEST(NameTests, DeserializationShortReadKeepsExistingBufferTail)
+{
+    const unsigned char encoded[] = {5, 0, 0, 0, 'X', 'Y'};
+    B_IDataFile file;
+    SetNameInputCache(file, encoded, sizeof(encoded));
+    B_Name name("Blade");
+    char *buffer = name.String();
+    file >> name;
+    EXPECT_EQ(buffer, name.String());
+    EXPECT_EQ(5u, name.Length());
+    EXPECT_STREQ("XYade", name.String());
+    EXPECT_EQ(sizeof(encoded), file.posInCacheBlock);
+}
+
+
+TEST(NameTests, SerializationAndDeserializationRoundTripRawBuffer)
+{
+    B_ODataFile output("NUL", _O_BINARY);
+    ASSERT_NE(0u, output.OK());
+    B_Name source("Blade");
+    source.String()[2] = '\0';
+    output << source;
+    B_IDataFile input;
+    SetNameInputCache(input, output.fileCache, output.posInCacheBlock);
+    B_Name result;
+    input >> result;
+    EXPECT_EQ(source.Length(), result.Length());
+    EXPECT_EQ(0, memcmp(source.String(), result.String(), source.Length()));
+    EXPECT_EQ('\0', result.String()[result.Length()]);
+    EXPECT_NE(source.String(), result.String());
 }
 
 

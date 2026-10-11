@@ -1,5 +1,6 @@
 #define BBLIBC_LIB_EXPORT
 #include "Name.h"
+#include "IDataFile.h"
 #include "ODataFile.h"
 
 
@@ -240,25 +241,37 @@ B_Name B_Name::Left(unsigned int count) const
 * Entry point:            0x10003904
 * VC++ mangling:          ??5@YAAAVB_IDataFile@@AAV0@AAVB_Name@@@Z
 */
-#ifndef BLD_NATIVE
 B_IDataFile &operator >>(B_IDataFile &file, B_Name &name)
 {
+    unsigned int length;
+    file >> length;
+    // Original reuses equal-length buffers and trusts the serialized length.
+    if (length != name.len) {
+        delete[] name.string;
+        name.len = length;
+        name.string = new char[length + 1];
+    }
+    // Read raw bytes, including embedded NULs, then append a terminator locally.
+    // A short read leaves the remaining buffer bytes unchanged or uninitialized.
+    file.Read(name.string, name.len);
+    name.string[name.len] = '\0';
     return file;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x1000398A
 * VC++ mangling:          ??6@YAAAVB_ODataFile@@AAV0@ABVB_Name@@@Z
 */
-#ifndef BLD_NATIVE
 B_ODataFile &operator <<(B_ODataFile &file, B_Name const &name)
 {
-    file.Write(&name, sizeof(B_Name));
+    const unsigned int length = name.Length();
+    // Original stores the 32-bit length and exactly len bytes, without a final NUL.
+    // Stored length controls serialization, including bytes after an earlier NUL.
+    file << length;
+    file.Write(name.String(), length);
     return file;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

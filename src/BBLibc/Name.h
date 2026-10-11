@@ -76,6 +76,7 @@ public:
 
     void UpCase();
 private:
+    friend LIB_EXP B_IDataFile &operator >>(B_IDataFile &file, B_Name &name);
     char *string;
     unsigned int len;
 };

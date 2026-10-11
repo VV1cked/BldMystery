@@ -3187,90 +3187,14 @@ l10003250 ENDP
 ;
 ;* Export: ??5@YAAAVB_IDataFile@@AAV0@AAVB_Name@@@Z, 005D
 ;
-l10003904 PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 00000000Ch
-           lea eax, [ebp-004h]
-           push eax
-           mov ecx, dword ptr [ebp+008h]
-           push ecx
-           call l10001BEF
-           add esp, 000000008h
-           mov edx, dword ptr [ebp+00Ch]
-           mov eax, dword ptr [ebp-004h]
-           cmp eax, dword ptr [edx+004h]
-           je l1000395F
-           mov ecx, dword ptr [ebp+00Ch]
-           mov edx, dword ptr [ecx]
-           mov dword ptr [ebp-008h], edx
-           mov eax, dword ptr [ebp-008h]
-           push eax
-           call l100415C0; [BICRT.??3@YAXPAX@Z].
-           add esp, 000000004h
-           mov ecx, dword ptr [ebp+00Ch]
-           mov edx, dword ptr [ebp-004h]
-           mov dword ptr [ecx+004h], edx
-           mov eax, dword ptr [ebp+00Ch]
-           mov ecx, dword ptr [eax+004h]
-           add ecx, 000000001h
-           push ecx
-           call l100415E4; [BICRT.??2@YAPAXI@Z].
-           add esp, 000000004h
-           mov dword ptr [ebp-00Ch], eax
-           mov edx, dword ptr [ebp+00Ch]
-           mov eax, dword ptr [ebp-00Ch]
-           mov dword ptr [edx], eax
-;
-;* Jump:
-; 10003923(C) 
-;
-l1000395F: mov ecx, dword ptr [ebp+00Ch]
-           mov edx, dword ptr [ecx+004h]
-           push edx
-           mov eax, dword ptr [ebp+00Ch]
-           mov ecx, dword ptr [eax]
-           push ecx
-           mov ecx, dword ptr [ebp+008h]
-           call l10001A33
-           mov edx, dword ptr [ebp+00Ch]
-           mov eax, dword ptr [edx]
-           mov ecx, dword ptr [ebp+00Ch]
-           mov edx, dword ptr [ecx+004h]
-           mov byte ptr [eax+edx], 000h
-           mov eax, dword ptr [ebp+008h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10003904 ENDP
+           call l10003904; Implemented in c++ code
 ;
 ;* Call:
 ; 10003A66, 10040E9B, 10040EBF, 10041448 
 ;
 ;* Export: ??6@YAAAVB_ODataFile@@AAV0@ABVB_Name@@@Z, 006F
 ;
-l1000398A PROC
-           push ebp
-           mov ebp, esp
-           mov eax, dword ptr [ebp+00Ch]
-           add eax, 000000004h
-           push eax
-           mov ecx, dword ptr [ebp+008h]
-           push ecx
-           call l1000201E
-           add esp, 000000008h
-           mov edx, dword ptr [ebp+00Ch]
-           mov eax, dword ptr [edx+004h]
-           push eax
-           mov ecx, dword ptr [ebp+00Ch]
-           mov edx, dword ptr [ecx]
-           push edx
-           mov ecx, dword ptr [ebp+008h]
-           call l10001E86
-           mov eax, dword ptr [ebp+008h]
-           pop ebp
-           ret
-l1000398A ENDP
+           call l1000398A; Implemented in c++ code
 ;
 ;* Call:
 ; 10002316, 10002396, 1000241F, 10002456, 10002515, 1000256F, 1000260F, 100026A8, 
