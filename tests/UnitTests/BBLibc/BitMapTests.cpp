@@ -5,6 +5,10 @@
 #include <BBLibc/BitMap24.h>
 #include <cstring>
 #include <new>
+#include <fcntl.h>
+#define private public
+#include <BBLibc/ODataFile.h>
+#undef private
 
 
 TEST(BitMapTests, SizeOf)
@@ -178,4 +182,49 @@ TEST(BitMapTests, ConversionPreservesDimensionsAndUsesWrappedCount)
     EXPECT_EQ(4, static_cast<byte *>(single.data)[1]);
     EXPECT_EQ(0, std::memcmp(pixels, rgb.data, sizeof(pixels)));
     source.data = nullptr;
+}
+
+TEST(BitMapTests, SerializationWritesHeaderPixelsAndTypeSpecificPalette)
+{
+    B_Pal palette;
+    std::memset(&palette, 0xA5, sizeof(palette));
+    for (unsigned int type = 1; type <= 5; ++type)
+    {
+        B_BitMap bitmap(static_cast<B_BitMap::BitMapType>(type), 2, 3, &palette);
+        const unsigned int size = 6 * bitmap.BytesPerTexel();
+        std::memset(bitmap.data, 0x5A, size);
+        B_ODataFile output("NUL", _O_BINARY);
+        ASSERT_NE(0u, output.OK());
+        EXPECT_EQ(&output, &(output << bitmap));
+        const unsigned int header[] = {type, 2, 3};
+        const unsigned int paletteSize = type == 1 || type == 3 ? 768 : 0;
+        ASSERT_EQ(12u + size + paletteSize, output.posInCacheBlock);
+        EXPECT_EQ(0, std::memcmp(header, output.fileCache, sizeof(header)));
+        EXPECT_EQ(0, std::memcmp(bitmap.data, output.fileCache + 12, size));
+        if (paletteSize) EXPECT_EQ(0, std::memcmp(&palette, output.fileCache + 12 + size, paletteSize));
+    }
+}
+
+TEST(BitMapTests, SerializationPreservesUnknownTypeWithoutPayload)
+{
+    B_BitMap bitmap;
+    bitmap.type = static_cast<B_BitMap::BitMapType>(0xFFFFFFFFu);
+    bitmap.dimension1 = 99; bitmap.dimension2 = 88;
+    B_ODataFile output("NUL", _O_BINARY);
+    ASSERT_NE(0u, output.OK());
+    output << bitmap;
+    const unsigned int header[] = {0xFFFFFFFFu, 99, 88};
+    ASSERT_EQ(12u, output.posInCacheBlock);
+    EXPECT_EQ(0, std::memcmp(header, output.fileCache, sizeof(header)));
+}
+
+TEST(BitMapTests, SerializationUsesWrappedByteCount)
+{
+    B_BitMap bitmap(B_BitMap::BitMapType4, 0x80000001u, 2, nullptr);
+    std::memset(bitmap.data, 0x5A, 6);
+    B_ODataFile output("NUL", _O_BINARY);
+    ASSERT_NE(0u, output.OK());
+    output << bitmap;
+    ASSERT_EQ(18u, output.posInCacheBlock);
+    EXPECT_EQ(0, std::memcmp(bitmap.data, output.fileCache + 12, 6));
 }

@@ -3,6 +3,7 @@
 #include "ODataFile.h"
 #include "Color.h"
 #include <new>
+#include <cstdio>
 
 /*
 * Module:                 BBLibc.dll
@@ -232,12 +233,16 @@ B_ODataFile &operator <<(B_ODataFile &file, B_BitMap24 const &bitMap)
 * Entry point:            0x10028353
 * VC++ mangling:          ?EscribeArchivoRAW@B_BitMap24@@QBEXPBD@Z
 */
-#ifndef BLD_NATIVE
-void B_BitMap24::EscribeArchivoRAW(const char*) const
+void B_BitMap24::EscribeArchivoRAW(const char *fileName) const
 {
-
+    // Original writes only packed RGB bytes, with a wrapping 32-bit count and no header.
+    const unsigned int size = dimension1 * dimension2 * 3u;
+    FILE *file = std::fopen(fileName, "wb");
+    if (!file) return; // Original reports no open/write error to the caller.
+    std::fwrite(data, 1, size, file);
+    // Both complete and short writes close the file; the result is ignored.
+    std::fclose(file);
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

@@ -119,13 +119,23 @@ int B_BitMap::BytesPerTexel() const
 * Entry point:            0x10008B51
 * VC++ mangling:          ??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap@@@Z
 */
-#ifndef BLD_NATIVE
 B_ODataFile &operator <<(B_ODataFile &file, B_BitMap const &bitMap)
 {
-    file.Write(&bitMap, sizeof(B_BitMap));
+    // Original writes three 32-bit values, never the vtable or owning pointers.
+    const unsigned long type = static_cast<unsigned long>(bitMap.type);
+    file << type << bitMap.dimension1 << bitMap.dimension2;
+    if (type >= 1u && type <= 5u)
+    {
+        // Pixel byte count wraps to 32 bits. Only types 1 and 3 append a raw RGB palette.
+        const unsigned int size = bitMap.dimension1 * bitMap.dimension2 *
+            static_cast<unsigned int>(bitMap.BytesPerTexel());
+        file.Write(bitMap.data, size);
+        if (type == 1u || type == 3u)
+            file.Write(bitMap.pal, sizeof(B_Pal));
+    }
+    // Unknown type codes are preserved in the header and have no payload.
     return file;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
