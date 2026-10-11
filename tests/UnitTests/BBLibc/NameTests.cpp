@@ -84,3 +84,67 @@ TEST(NameTests, CompareNoCaseStopsAtNullForEqualStoredLengths)
     EXPECT_EQ(1u, name.CompareNoCase(other));
     EXPECT_EQ(1u, other.CompareNoCase(name));
 }
+
+
+TEST(NameTests, EqualityMatchesIdenticalStrings)
+{
+    const char *values[] = {"", "a", "ab", "abc", "Blade", "\x80\xFF"};
+    for (unsigned int i = 0; i < sizeof(values) / sizeof(values[0]); ++i)
+    {
+        const B_Name name(values[i]);
+        const B_Name same(values[i]);
+        EXPECT_EQ(1u, name == same);
+        EXPECT_EQ(1u, name == values[i]);
+        EXPECT_EQ(1u, name == name);
+    }
+}
+
+
+TEST(NameTests, EqualityIsCaseSensitive)
+{
+    const B_Name name("Blade");
+    const B_Name mixedCase("bLADE");
+    EXPECT_EQ(0u, name == mixedCase);
+    EXPECT_EQ(0u, mixedCase == name);
+    EXPECT_EQ(0u, name == "bLADE");
+}
+
+
+TEST(NameTests, EqualityRejectsDifferentBytesAndPrefixes)
+{
+    const B_Name name("abcd");
+    const char *others[] = {"", "xbcd", "axcd", "abxd", "abcx", "abc", "abcde"};
+    for (unsigned int i = 0; i < sizeof(others) / sizeof(others[0]); ++i)
+    {
+        const B_Name other(others[i]);
+        EXPECT_EQ(0u, name == other);
+        EXPECT_EQ(0u, other == name);
+        EXPECT_EQ(0u, name == others[i]);
+    }
+    const B_Name highBytes("\x80\xFF");
+    EXPECT_EQ(0u, highBytes == B_Name("\x80\xFE"));
+    EXPECT_EQ(0u, highBytes == "\x80\xFE");
+}
+
+
+TEST(NameTests, EqualityObjectChecksStoredLength)
+{
+    B_Name name("Blade");
+    const B_Name prefix("Bl");
+    name.String()[2] = '\0';
+    EXPECT_EQ(0u, name == prefix);
+    EXPECT_EQ(0u, prefix == name);
+    EXPECT_EQ(1u, name == "Bl");
+}
+
+
+TEST(NameTests, EqualityStopsAtNullWithEqualStoredLengths)
+{
+    B_Name name("Blade");
+    B_Name other("Blxyz");
+    name.String()[2] = '\0';
+    other.String()[2] = '\0';
+    EXPECT_EQ(1u, name == other);
+    EXPECT_EQ(1u, other == name);
+    EXPECT_EQ(1u, name == "Bl\0different tail");
+}

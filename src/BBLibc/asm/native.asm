@@ -3251,144 +3251,14 @@ l100034DA ENDP
 ;
 ;* Export: ??8B_Name@@QBEIABV0@@Z, 0076
 ;
-l1000354D PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000018h
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [eax+004h]
-           cmp edx, dword ptr [ecx+004h]
-           jne l100035CA
-           mov eax, dword ptr [ebp+008h]
-           mov ecx, dword ptr [eax]
-           mov dword ptr [ebp-008h], ecx
-           mov edx, dword ptr [ebp-004h]
-           mov eax, dword ptr [edx]
-           mov dword ptr [ebp-00Ch], eax
-;
-;* Jump:
-; 100035A6(C) 
-;
-l10003574: mov ecx, dword ptr [ebp-00Ch]
-           mov dl, byte ptr [ecx]
-           mov byte ptr [ebp-00Dh], dl
-           mov eax, dword ptr [ebp-008h]
-           cmp dl, byte ptr [eax]
-           jne l100035B1
-           cmp byte ptr [ebp-00Dh], 000h
-           je l100035A8
-           mov ecx, dword ptr [ebp-00Ch]
-           mov dl, byte ptr [ecx+001h]
-           mov byte ptr [ebp-00Eh], dl
-           mov eax, dword ptr [ebp-008h]
-           cmp dl, byte ptr [eax+001h]
-           jne l100035B1
-           add dword ptr [ebp-00Ch], 000000002h
-           add dword ptr [ebp-008h], 000000002h
-           cmp byte ptr [ebp-00Eh], 000h
-           jne l10003574
-;
-;* Jump:
-; 10003587(C) 
-;
-l100035A8: mov dword ptr [ebp-014h], 000000000h
-           jmp l100035B9
-;
-;* Jump:
-; 10003581(C), 10003598(C) 
-;
-l100035B1: sbb ecx, ecx
-           sbb ecx, 0FFFFFFFFh
-           mov dword ptr [ebp-014h], ecx
-;
-;* Jump:
-; 100035AF(U) 
-;
-l100035B9: mov edx, dword ptr [ebp-014h]
-           mov dword ptr [ebp-018h], edx
-           xor eax, eax
-           cmp dword ptr [ebp-018h], 000000000h
-           sete  al
-           jmp l100035CC
-;
-;* Jump:
-; 10003562(C) 
-;
-l100035CA: xor eax, eax
-;
-;* Jump:
-; 100035C8(U) 
-;
-l100035CC: mov esp, ebp
-           pop ebp
-           ret 00004h
-l1000354D ENDP
+           call l1000354D; Implemented in c++ code
 ;
 ;* Call:
 ; 10035C2E 
 ;
 ;* Export: ??8B_Name@@QBEIPBD@Z, 0077
 ;
-l100035D2 PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000018h
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+008h]
-           mov dword ptr [ebp-008h], eax
-           mov ecx, dword ptr [ebp-004h]
-           mov edx, dword ptr [ecx]
-           mov dword ptr [ebp-00Ch], edx
-;
-;* Jump:
-; 1000361B(C) 
-;
-l100035E9: mov eax, dword ptr [ebp-00Ch]
-           mov cl, byte ptr [eax]
-           mov byte ptr [ebp-00Dh], cl
-           mov edx, dword ptr [ebp-008h]
-           cmp cl, byte ptr [edx]
-           jne l10003626
-           cmp byte ptr [ebp-00Dh], 000h
-           je l1000361D
-           mov eax, dword ptr [ebp-00Ch]
-           mov cl, byte ptr [eax+001h]
-           mov byte ptr [ebp-00Eh], cl
-           mov edx, dword ptr [ebp-008h]
-           cmp cl, byte ptr [edx+001h]
-           jne l10003626
-           add dword ptr [ebp-00Ch], 000000002h
-           add dword ptr [ebp-008h], 000000002h
-           cmp byte ptr [ebp-00Eh], 000h
-           jne l100035E9
-;
-;* Jump:
-; 100035FC(C) 
-;
-l1000361D: mov dword ptr [ebp-014h], 000000000h
-           jmp l1000362E
-;
-;* Jump:
-; 100035F6(C), 1000360D(C) 
-;
-l10003626: sbb eax, eax
-           sbb eax, 0FFFFFFFFh
-           mov dword ptr [ebp-014h], eax
-;
-;* Jump:
-; 10003624(U) 
-;
-l1000362E: mov ecx, dword ptr [ebp-014h]
-           mov dword ptr [ebp-018h], ecx
-           xor eax, eax
-           cmp dword ptr [ebp-018h], 000000000h
-           sete  al
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l100035D2 ENDP
+           call l100035D2; Implemented in c++ code
 ;
 ;* Export: ??9B_Name@@QBEIABV0@@Z, 0079
 ;

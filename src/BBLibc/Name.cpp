@@ -98,12 +98,14 @@ unsigned int B_Name::operator <(const B_Name &rhs) const
 * Entry point:            0x1000354D
 * VC++ mangling:          ??8B_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator ==(const B_Name &rhs) const
 {
-    return 0;
+    if (this->len != rhs.len)
+    {
+        return 0;
+    }
+    return strcmp(this->string, rhs.string) == 0;
 }
-#endif
 
 
 /*
@@ -111,12 +113,10 @@ unsigned int B_Name::operator ==(const B_Name &rhs) const
 * Entry point:            0x100035D2
 * VC++ mangling:          ??8B_Name@@QBEIPBD@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator ==(const char *str) const
 {
-    return 0;
+    return strcmp(this->string, str) == 0;
 }
-#endif
 
 
 /*
