@@ -227,6 +227,90 @@ TEST(NameTests, InequalityStopsAtNullWithEqualStoredLengths)
 }
 
 
+TEST(NameTests, ConcatenationPreservesExtraStoredLength)
+{
+    const B_Name left("Bl"), right("ade");
+    const B_Name names = left + right;
+    const B_Name suffix = left + "ade";
+    const B_Name prefix = "Bl" + right;
+    EXPECT_STREQ("Blade", names.String());
+    EXPECT_STREQ("Blade", suffix.String());
+    EXPECT_STREQ("Blade", prefix.String());
+    EXPECT_EQ(6u, names.Length());
+    EXPECT_EQ(6u, suffix.Length());
+    EXPECT_EQ(6u, prefix.Length());
+    // Object equality checks stored length despite identical text.
+    EXPECT_EQ(0u, names == B_Name("Blade"));
+    EXPECT_EQ(1u, names == "Blade");
+}
+
+
+TEST(NameTests, ConcatenationEmptyNamesStillAddExtraStoredByte)
+{
+    const B_Name empty;
+    const B_Name names = empty + empty;
+    const B_Name suffix = empty + "";
+    const B_Name prefix = "" + empty;
+    EXPECT_STREQ("", names.String());
+    EXPECT_STREQ("", suffix.String());
+    EXPECT_STREQ("", prefix.String());
+    EXPECT_EQ(1u, names.Length());
+    EXPECT_EQ(1u, suffix.Length());
+    EXPECT_EQ(1u, prefix.Length());
+    const B_Name name("a");
+    EXPECT_EQ(2u, (name + empty).Length());
+    EXPECT_EQ(2u, (empty + name).Length());
+    EXPECT_STREQ("a", (name + empty).String());
+    EXPECT_STREQ("a", (empty + name).String());
+}
+
+
+TEST(NameTests, ConcatenationUsesStoredLengthsButStopsCopyingAtNull)
+{
+    B_Name left("Blade"), right("Sword");
+    left.String()[2] = '\0';
+    right.String()[1] = '\0';
+    const B_Name names = ::operator +(left, right);
+    const B_Name suffix = ::operator +(left, "S\0ignored");
+    const B_Name prefix = ::operator +("Bl\0ignored", right);
+    EXPECT_STREQ("BlS", names.String());
+    EXPECT_STREQ("BlS", suffix.String());
+    EXPECT_STREQ("BlS", prefix.String());
+    EXPECT_EQ(11u, names.Length());
+    EXPECT_EQ(7u, suffix.Length());
+    EXPECT_EQ(8u, prefix.Length());
+}
+
+
+TEST(NameTests, ConcatenationOwnsBufferAndSupportsRepeatedOperands)
+{
+    B_Name name("\x80\xFF");
+    B_Name doubled = ::operator +(name, name);
+    B_Name suffix = ::operator +(name, name.String());
+    B_Name prefix = ::operator +(name.String(), name);
+    EXPECT_STREQ("\x80\xFF\x80\xFF", doubled.String());
+    EXPECT_STREQ(doubled.String(), suffix.String());
+    EXPECT_STREQ(doubled.String(), prefix.String());
+    EXPECT_EQ(5u, doubled.Length());
+    EXPECT_EQ(5u, suffix.Length());
+    EXPECT_EQ(5u, prefix.Length());
+    EXPECT_NE(name.String(), doubled.String());
+    doubled.String()[0] = 'x';
+    EXPECT_STREQ("\x80\xFF", name.String());
+    name.String()[0] = 'y';
+    EXPECT_STREQ("\x80\xFF\x80\xFF", suffix.String());
+    EXPECT_STREQ("\x80\xFF\x80\xFF", prefix.String());
+}
+
+
+TEST(NameTests, ConcatenationChainsAccumulateExtraStoredBytes)
+{
+    const B_Name result = ::operator +(::operator +(B_Name("a"), B_Name("b")), B_Name("c"));
+    EXPECT_STREQ("abc", result.String());
+    EXPECT_EQ(5u, result.Length());
+}
+
+
 TEST(NameTests, AssignmentReusesBufferForEqualStoredLengths)
 {
     B_Name name("Blade");

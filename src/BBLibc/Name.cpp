@@ -277,12 +277,15 @@ B_Name::~B_Name() {
 * Entry point:            0x10003A70
 * VC++ mangling:          ??H@YA?AVB_Name@@ABV0@0@Z
 */
-#ifndef BLD_NATIVE
 B_Name operator +(B_Name const &lother, B_Name const &rother)
 {
-    return lother;
+    // Original stored length includes an extra byte, even for two empty names.
+    B_Name result(lother.Length() + rother.Length() + 1);
+    // Copy text up to NUL while retaining the length based on stored lengths.
+    strcpy(result.String(), lother.String());
+    strcat(result.String(), rother.String());
+    return result;
 }
-#endif
 
 
 /*
@@ -290,12 +293,14 @@ B_Name operator +(B_Name const &lother, B_Name const &rother)
 * Entry point:            0x10003B1E
 * VC++ mangling:          ??H@YA?AVB_Name@@ABV0@PBD@Z
 */
-#ifndef BLD_NATIVE
 B_Name operator +(B_Name const &other, const char *str)
 {
-    return other;
+    // Preserve the original extra byte and the name's possibly stale stored length.
+    B_Name result(other.Length() + static_cast<unsigned int>(strlen(str)) + 1);
+    strcpy(result.String(), other.String());
+    strcat(result.String(), str);
+    return result;
 }
-#endif
 
 
 /*
@@ -303,12 +308,14 @@ B_Name operator +(B_Name const &other, const char *str)
 * Entry point:            0x10003BC7
 * VC++ mangling:          ??H@YA?AVB_Name@@PBDABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Name operator +(const char *str, const B_Name &bName)
 {
-    return str;
+    // Preserve the original extra byte and the name's possibly stale stored length.
+    B_Name result(static_cast<unsigned int>(strlen(str)) + bName.Length() + 1);
+    strcpy(result.String(), str);
+    strcat(result.String(), bName.String());
+    return result;
 }
-#endif
 
 
 /*
