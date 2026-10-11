@@ -341,6 +341,26 @@ TEST(NameTests, AppendPreservesHighBytesAndIndependentOwnership)
 }
 
 
+TEST(NameTests, ConcatenationResolvesForMutableNamesAndTemporaries)
+{
+    B_Name left("Bl"), right("ade");
+    const B_Name names = left + right;
+    const B_Name suffix = left + "ade";
+    const B_Name prefix = "Bl" + right;
+    const B_Name temporaries = B_Name("Bl") + B_Name("ade");
+    EXPECT_STREQ("Blade", names.String());
+    EXPECT_STREQ("Blade", suffix.String());
+    EXPECT_STREQ("Blade", prefix.String());
+    EXPECT_STREQ("Blade", temporaries.String());
+    EXPECT_EQ(6u, names.Length());
+    EXPECT_EQ(6u, suffix.Length());
+    EXPECT_EQ(6u, prefix.Length());
+    EXPECT_EQ(6u, temporaries.Length());
+    EXPECT_STREQ("Bl", left.String());
+    EXPECT_STREQ("ade", right.String());
+}
+
+
 TEST(NameTests, ConcatenationPreservesExtraStoredLength)
 {
     const B_Name left("Bl"), right("ade");

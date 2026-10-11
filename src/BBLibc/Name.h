@@ -39,9 +39,6 @@ public:
     const B_Name &operator +=(char c);
     B_Name const &operator +=(B_Name const &other);
 
-    B_Name const &operator +(const char *str);
-
-
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x100022C0
