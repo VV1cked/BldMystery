@@ -3241,38 +3241,14 @@ l10003250 ENDP
 ;
 ;* Export: ??5@YAAAVB_IDataFile@@AAV0@AAVB_NamedObj@@@Z, 005E
 ;
-l10003A40 PROC
-           push ebp
-           mov ebp, esp
-           mov eax, dword ptr [ebp+00Ch]
-           add eax, 000000004h
-           push eax
-           mov ecx, dword ptr [ebp+008h]
-           push ecx
-           call l10003904
-           add esp, 000000008h
-           pop ebp
-           ret
-l10003A40 ENDP
+           call l10003A40; Implemented in c++ code
 ;
 ;* Call:
 ; 10004699, 1003272E, 100328D1, 1003296C, 10032A05, 10032A95, 100413FC 
 ;
 ;* Export: ??6@YAAAVB_ODataFile@@AAV0@ABVB_NamedObj@@@Z, 0070
 ;
-l10003A58 PROC
-           push ebp
-           mov ebp, esp
-           mov eax, dword ptr [ebp+00Ch]
-           add eax, 000000004h
-           push eax
-           mov ecx, dword ptr [ebp+008h]
-           push ecx
-           call l1000398A
-           add esp, 000000008h
-           pop ebp
-           ret
-l10003A58 ENDP
+           call l10003A58; Implemented in c++ code
 ;
 ;* Export: ??H@YA?AVB_Name@@ABV0@0@Z, 007D
 ;
