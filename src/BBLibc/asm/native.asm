@@ -3241,109 +3241,11 @@ l1000378E ENDP
 ;
 ;* Export: ?Right@B_Name@@QBE?AV1@I@Z, 0102
 ;
-l10003821 PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 00000000Ch
-           mov dword ptr [ebp-00Ch], ecx
-           cmp dword ptr [ebp+00Ch], 000000000h
-           jnb l10003839
-           mov dword ptr [ebp+00Ch], 000000000h
-           jmp l1000384D
-;
-;* Jump:
-; 1000382E(C) 
-;
-l10003839: mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [ebp+00Ch]
-           cmp ecx, dword ptr [eax+004h]
-           jbe l1000384D
-           mov edx, dword ptr [ebp-00Ch]
-           mov eax, dword ptr [edx+004h]
-           mov dword ptr [ebp+00Ch], eax
-;
-;* Jump:
-; 10003837(U), 10003842(C) 
-;
-l1000384D: mov ecx, dword ptr [ebp+00Ch]
-           push ecx
-           lea ecx, [ebp-008h]
-           call l10003410
-           mov edx, dword ptr [ebp+00Ch]
-           push edx
-           mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [eax+004h]
-           sub ecx, dword ptr [ebp+00Ch]
-           mov edx, dword ptr [ebp-00Ch]
-           mov eax, dword ptr [edx]
-           add eax, ecx
-           push eax
-           mov ecx, dword ptr [ebp-008h]
-           push ecx
-           call [__imp_strncpy]; [BICRT.strncpy].
-           add esp, 00000000Ch
-           lea edx, [ebp-008h]
-           push edx
-           mov ecx, dword ptr [ebp+008h]
-           call l100033A4
-           lea ecx, [ebp-008h]
-           call l100039BA
-           mov eax, dword ptr [ebp+008h]
-           mov esp, ebp
-           pop ebp
-           ret 00008h
-l10003821 ENDP
+           call l10003821; Implemented in c++ code
 ;
 ;* Export: ?Left@B_Name@@QBE?AV1@I@Z, 00DB
 ;
-l10003898 PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 00000000Ch
-           mov dword ptr [ebp-00Ch], ecx
-           cmp dword ptr [ebp+00Ch], 000000000h
-           jnb l100038B0
-           mov dword ptr [ebp+00Ch], 000000000h
-           jmp l100038C4
-;
-;* Jump:
-; 100038A5(C) 
-;
-l100038B0: mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [ebp+00Ch]
-           cmp ecx, dword ptr [eax+004h]
-           jbe l100038C4
-           mov edx, dword ptr [ebp-00Ch]
-           mov eax, dword ptr [edx+004h]
-           mov dword ptr [ebp+00Ch], eax
-;
-;* Jump:
-; 100038AE(U), 100038B9(C) 
-;
-l100038C4: mov ecx, dword ptr [ebp+00Ch]
-           push ecx
-           lea ecx, [ebp-008h]
-           call l10003410
-           mov edx, dword ptr [ebp+00Ch]
-           push edx
-           mov eax, dword ptr [ebp-00Ch]
-           mov ecx, dword ptr [eax]
-           push ecx
-           mov edx, dword ptr [ebp-008h]
-           push edx
-           call [__imp_strncpy]; [BICRT.strncpy].
-           add esp, 00000000Ch
-           lea eax, [ebp-008h]
-           push eax
-           mov ecx, dword ptr [ebp+008h]
-           call l100033A4
-           lea ecx, [ebp-008h]
-           call l100039BA
-           mov eax, dword ptr [ebp+008h]
-           mov esp, ebp
-           pop ebp
-           ret 00008h
-l10003898 ENDP
+           call l10003898; Implemented in c++ code
 ;
 ;* Call:
 ; 10003A4E, 10004F6D, 100055D1, 10040D6E, 10041269 

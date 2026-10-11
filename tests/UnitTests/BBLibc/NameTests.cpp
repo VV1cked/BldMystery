@@ -227,6 +227,90 @@ TEST(NameTests, InequalityStopsAtNullWithEqualStoredLengths)
 }
 
 
+TEST(NameTests, SlicesSelectPrefixAndSuffix)
+{
+    const B_Name name("Blade");
+    const B_Name left = name.Left(2);
+    const B_Name right = name.Right(2);
+    EXPECT_EQ(2u, left.Length());
+    EXPECT_EQ(2u, right.Length());
+    EXPECT_STREQ("Bl", left.String());
+    EXPECT_STREQ("de", right.String());
+    EXPECT_EQ('\0', left.String()[2]);
+    EXPECT_EQ('\0', right.String()[2]);
+    EXPECT_STREQ("Blade", name.String());
+}
+
+
+TEST(NameTests, SlicesClampCountToStoredLength)
+{
+    const B_Name name("Blade");
+    const unsigned int counts[] = {5u, 6u, 0xFFFFFFFFu};
+    for (unsigned int i = 0; i < sizeof(counts) / sizeof(counts[0]); ++i)
+    {
+        const B_Name left = name.Left(counts[i]);
+        const B_Name right = name.Right(counts[i]);
+        EXPECT_EQ(5u, left.Length());
+        EXPECT_EQ(5u, right.Length());
+        EXPECT_STREQ("Blade", left.String());
+        EXPECT_STREQ("Blade", right.String());
+    }
+}
+
+
+TEST(NameTests, SlicesHandleZeroCountAndEmptyNames)
+{
+    const B_Name name("Blade");
+    const B_Name empty;
+    const B_Name left = name.Left(0);
+    const B_Name right = name.Right(0);
+    const B_Name emptyLeft = empty.Left(0xFFFFFFFFu);
+    const B_Name emptyRight = empty.Right(0xFFFFFFFFu);
+    EXPECT_EQ(0u, left.Length());
+    EXPECT_EQ(0u, right.Length());
+    EXPECT_EQ(0u, emptyLeft.Length());
+    EXPECT_EQ(0u, emptyRight.Length());
+    EXPECT_STREQ("", left.String());
+    EXPECT_STREQ("", right.String());
+    EXPECT_STREQ("", emptyLeft.String());
+    EXPECT_STREQ("", emptyRight.String());
+}
+
+
+TEST(NameTests, SlicesUseStoredLengthAfterBufferMutation)
+{
+    B_Name name("Blade");
+    name.String()[2] = '\0';
+    const B_Name left = name.Left(4);
+    const B_Name right = name.Right(2);
+    const B_Name rightAcrossNull = name.Right(4);
+    EXPECT_EQ(4u, left.Length());
+    EXPECT_STREQ("Bl", left.String());
+    EXPECT_EQ(2u, right.Length());
+    EXPECT_STREQ("de", right.String());
+    EXPECT_EQ(4u, rightAcrossNull.Length());
+    EXPECT_STREQ("l", rightAcrossNull.String());
+}
+
+
+TEST(NameTests, SlicesOwnIndependentBuffersAndPreserveHighBytes)
+{
+    B_Name name("\x7F\x80\xFF");
+    B_Name left = name.Left(2);
+    B_Name right = name.Right(2);
+    EXPECT_STREQ("\x7F\x80", left.String());
+    EXPECT_STREQ("\x80\xFF", right.String());
+    EXPECT_NE(name.String(), left.String());
+    EXPECT_NE(name.String(), right.String());
+    EXPECT_NE(left.String(), right.String());
+    left.String()[1] = 'x';
+    right.String()[0] = 'y';
+    EXPECT_STREQ("\x7F\x80\xFF", name.String());
+    EXPECT_STREQ("\x7F" "x", left.String());
+    EXPECT_STREQ("y\xFF", right.String());
+}
+
+
 TEST(NameTests, OrderingEqualNames)
 {
     const char *values[] = {"", "a", "ab", "abc", "Blade", "\x80\xFF"};

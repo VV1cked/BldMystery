@@ -192,7 +192,6 @@ B_Name &B_Name::operator =(const B_Name &src)
 * Entry point:            0x10003821
 * VC++ mangling:          ?Right@B_Name@@QBE?AV1@I@Z
 */
-#ifndef BLD_NATIVE
 B_Name B_Name::Right(unsigned int count) const
 {
     if (count > len) {
@@ -203,7 +202,6 @@ B_Name B_Name::Right(unsigned int count) const
     strncpy(result.string, string + (len - count), count);
     return result;
 }
-#endif
 
 
 /*
@@ -211,7 +209,6 @@ B_Name B_Name::Right(unsigned int count) const
 * Entry point:            0x10003898
 * VC++ mangling:          ?Left@B_Name@@QBE?AV1@I@Z
 */
-#ifndef BLD_NATIVE
 B_Name B_Name::Left(unsigned int count) const
 {
     if (count > len) {
@@ -222,7 +219,6 @@ B_Name B_Name::Left(unsigned int count) const
     strncpy(result.string, string, count);
     return result;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
