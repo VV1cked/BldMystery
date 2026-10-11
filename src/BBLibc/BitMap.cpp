@@ -52,12 +52,18 @@ B_BitMap::B_BitMap(BitMapType arg_1, const B_BitMap24 &arg_2)
 * Entry point:            0x10008AF0
 * VC++ mangling:          ?BytesPerTexel@B_BitMap@@QBEHXZ
 */
-#ifndef BLD_NATIVE
 int B_BitMap::BytesPerTexel() const
 {
-    return 0;
+    // Original maps both type 1 and type 2 to one byte; unknown types return zero.
+    switch (static_cast<unsigned int>(type))
+    {
+        case 1: case 2: return 1;
+        case 3: return 2;
+        case 4: return 3;
+        case 5: return 4;
+        default: return 0;
+    }
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

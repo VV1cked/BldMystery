@@ -8082,23 +8082,7 @@ l10006E70 ENDP
 ;
 ;* Export: ?GetDimension@B_BitMap24@@QBEXAAH0@Z, 00BC
 ;
-l10007090 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+008h]
-           mov ecx, dword ptr [ebp-004h]
-           mov edx, dword ptr [ecx+004h]
-           mov dword ptr [eax], edx
-           mov eax, dword ptr [ebp+00Ch]
-           mov ecx, dword ptr [ebp-004h]
-           mov edx, dword ptr [ecx+008h]
-           mov dword ptr [eax], edx
-           mov esp, ebp
-           pop ebp
-           ret 00008h
-l10007090 ENDP
+           call l10007090; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -8116,17 +8100,7 @@ l10007090 ENDP
 ;
 ;* Export: ?GetBits@B_BitMap24@@QBEPBEXZ, 00B8
 ;
-l100070C0 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov eax, dword ptr [eax+00Ch]
-           mov esp, ebp
-           pop ebp
-           ret
-l100070C0 ENDP
+           call l100070C0; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -11057,48 +11031,7 @@ l10008974 ENDP
 ;
 ;* Export: ?BytesPerTexel@B_BitMap@@QBEHXZ, 009D
 ;
-l10008AF0 PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000008h
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [eax+004h]
-           mov dword ptr [ebp-008h], ecx
-           mov edx, dword ptr [ebp-008h]
-           sub edx, 000000001h
-           mov dword ptr [ebp-008h], edx
-           cmp dword ptr [ebp-008h], 000000004h
-           ja l10008B37
-           mov eax, dword ptr [ebp-008h]
-           jmp [offset g10008B3D+eax*04h]
-l10008B1B: mov eax, 000000001h
-           jmp l10008B39
-l10008B22: mov eax, 000000002h
-           jmp l10008B39
-l10008B29: mov eax, 000000003h
-           jmp l10008B39
-l10008B30: mov eax, 000000004h
-           jmp l10008B39
-;
-;* Jump:
-; 10008B0F(C) 
-;
-l10008B37: xor eax, eax
-;
-;* Jump:
-; 10008B20(U), 10008B27(U), 10008B2E(U), 10008B35(U) 
-;
-l10008B39: mov esp, ebp
-           pop ebp
-           ret
-;
-g10008B3D  dd l10008B1B
-           dd l10008B1B
-           dd l10008B22
-           dd l10008B29
-           dd l10008B30
-l10008AF0 ENDP
+           call l10008AF0; Implemented in c++ code
 ;
 ;* Call:
 ; 100084F1 
@@ -63949,118 +63882,11 @@ l10028353 ENDP
 ;
 ;* Export: ?ChangeRGBOrder@B_BitMap24@@QAEXXZ, 009F
 ;
-l100283CD PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000014h
-           mov dword ptr [ebp-014h], ecx
-           mov eax, dword ptr [ebp-014h]
-           mov ecx, dword ptr [ebp-014h]
-           mov edx, dword ptr [eax+004h]
-           imul edx, dword ptr [ecx+008h]
-           mov dword ptr [ebp-00Ch], edx
-           mov eax, dword ptr [ebp-014h]
-           mov ecx, dword ptr [eax+00Ch]
-           mov dword ptr [ebp-004h], ecx
-           mov dword ptr [ebp-008h], 000000000h
-           jmp l1002840A
-;
-;* Jump:
-; 1002842E(U) 
-;
-l100283F8: mov edx, dword ptr [ebp-004h]
-           add edx, 000000003h
-           mov dword ptr [ebp-004h], edx
-           mov eax, dword ptr [ebp-008h]
-           add eax, 000000001h
-           mov dword ptr [ebp-008h], eax
-;
-;* Jump:
-; 100283F6(U) 
-;
-l1002840A: mov ecx, dword ptr [ebp-008h]
-           cmp ecx, dword ptr [ebp-00Ch]
-           jnl l10028430
-           mov edx, dword ptr [ebp-004h]
-           mov al, byte ptr [edx]
-           mov byte ptr [ebp-010h], al
-           mov ecx, dword ptr [ebp-004h]
-           mov edx, dword ptr [ebp-004h]
-           mov al, byte ptr [edx+002h]
-           mov byte ptr [ecx], al
-           mov ecx, dword ptr [ebp-004h]
-           mov dl, byte ptr [ebp-010h]
-           mov byte ptr [ecx+002h], dl
-           jmp l100283F8
-;
-;* Jump:
-; 10028410(C) 
-;
-l10028430: mov esp, ebp
-           pop ebp
-           ret
-l100283CD ENDP
+           call l100283CD; Implemented in c++ code
 ;
 ;* Export: ?GetPixelAt@B_BitMap24@@QBEIHHAAVB_Color@@@Z, 00C6
 ;
-l10028434 PROC
-           push ebp
-           mov ebp, esp
-           sub esp, 000000008h
-           mov dword ptr [ebp-008h], ecx
-           cmp dword ptr [ebp+008h], 000000000h
-           jl l100284B6
-           mov eax, dword ptr [ebp-008h]
-           mov ecx, dword ptr [ebp+008h]
-           cmp ecx, dword ptr [eax+004h]
-           jnl l100284B6
-           cmp dword ptr [ebp+00Ch], 000000000h
-           jl l100284B6
-           mov edx, dword ptr [ebp-008h]
-           mov eax, dword ptr [ebp+00Ch]
-           cmp eax, dword ptr [edx+008h]
-           jnl l100284B6
-           mov ecx, dword ptr [ebp-008h]
-           mov edx, dword ptr [ebp+00Ch]
-           imul edx, dword ptr [ecx+004h]
-           imul edx, edx, 000000003h
-           mov eax, dword ptr [ebp+008h]
-           imul eax, eax, 000000003h
-           add edx, eax
-           mov dword ptr [ebp-004h], edx
-           mov ecx, dword ptr [ebp-008h]
-           mov edx, dword ptr [ecx+00Ch]
-           mov eax, dword ptr [ebp+010h]
-           mov ecx, dword ptr [ebp-004h]
-           mov dl, byte ptr [edx+ecx]
-           mov byte ptr [eax+004h], dl
-           mov eax, dword ptr [ebp-008h]
-           mov ecx, dword ptr [eax+00Ch]
-           mov edx, dword ptr [ebp+010h]
-           mov eax, dword ptr [ebp-004h]
-           mov cl, byte ptr [ecx+eax+001h]
-           mov byte ptr [edx+005h], cl
-           mov edx, dword ptr [ebp-008h]
-           mov eax, dword ptr [edx+00Ch]
-           mov ecx, dword ptr [ebp+010h]
-           mov edx, dword ptr [ebp-004h]
-           mov al, byte ptr [eax+edx+002h]
-           mov byte ptr [ecx+006h], al
-           mov eax, 000000001h
-           jmp l100284B8
-;
-;* Jump:
-; 10028441(C), 1002844C(C), 10028452(C), 1002845D(C) 
-;
-l100284B6: xor eax, eax
-;
-;* Jump:
-; 100284B4(U) 
-;
-l100284B8: mov esp, ebp
-           pop ebp
-           ret 0000Ch
-l10028434 ENDP
+           call l10028434; Implemented in c++ code
 ;
            int 03h
            int 03h

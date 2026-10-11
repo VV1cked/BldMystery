@@ -36,8 +36,6 @@
 /EXPORT:??0B_BitMap24@@QAE@HH@Z=??0B_BitMap24@@QAE@HH@Z
 /EXPORT:?Clear@B_BitMap24@@QAEXXZ=?Clear@B_BitMap24@@QAEXXZ
 /EXPORT:??1B_BitMap24@@UAE@XZ=??1B_BitMap24@@UAE@XZ
-/EXPORT:?GetDimension@B_BitMap24@@QBEXAAH0@Z=?GetDimension@B_BitMap24@@QBEXAAH0@Z
-/EXPORT:?GetBits@B_BitMap24@@QBEPBEXZ=?GetBits@B_BitMap24@@QBEPBEXZ
 /EXPORT:??4B_RDataLight@@QAEAAV0@ABV0@@Z=??4B_RDataLight@@QAEAAV0@ABV0@@Z
 /EXPORT:??4B_RItem@@QAEAAV0@ABV0@@Z=??4B_RItem@@QAEAAV0@ABV0@@Z
 /EXPORT:??4B_RDataTriangle@@QAEAAV0@ABV0@@Z=??4B_RDataTriangle@@QAEAAV0@ABV0@@Z
@@ -45,7 +43,6 @@
 /EXPORT:??0B_BitMap@@QAE@W4BitMapType@0@IIPBVB_Pal@@@Z=??0B_BitMap@@QAE@W4BitMapType@0@IIPBVB_Pal@@@Z
 /EXPORT:??0B_BitMap@@QAE@ABV0@@Z=??0B_BitMap@@QAE@ABV0@@Z
 /EXPORT:??0B_BitMap@@QAE@W4BitMapType@0@ABVB_BitMap24@@@Z=??0B_BitMap@@QAE@W4BitMapType@0@ABVB_BitMap24@@@Z
-/EXPORT:?BytesPerTexel@B_BitMap@@QBEHXZ=?BytesPerTexel@B_BitMap@@QBEHXZ
 /EXPORT:??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap@@@Z=??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap@@@Z
 /EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z
 /EXPORT:??1B_BitMap@@UAE@XZ=??1B_BitMap@@UAE@XZ
@@ -62,8 +59,6 @@
 /EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap24@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap24@@@Z
 /EXPORT:??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap24@@@Z=??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap24@@@Z
 /EXPORT:?EscribeArchivoRAW@B_BitMap24@@QBEXPBD@Z=?EscribeArchivoRAW@B_BitMap24@@QBEXPBD@Z
-/EXPORT:?ChangeRGBOrder@B_BitMap24@@QAEXXZ=?ChangeRGBOrder@B_BitMap24@@QAEXXZ
-/EXPORT:?GetPixelAt@B_BitMap24@@QBEIHHAAVB_Color@@@Z=?GetPixelAt@B_BitMap24@@QBEIHHAAVB_Color@@@Z
 /EXPORT:?ReadFromJPEG@B_BitMap24@@QAEHPBD@Z=?ReadFromJPEG@B_BitMap24@@QAEHPBD@Z
 /EXPORT:?SaveToJPEG@B_BitMap24@@QBEHPBDH@Z=?SaveToJPEG@B_BitMap24@@QBEHPBDH@Z
 /EXPORT:??0B_ChannelOFile@@QAE@VB_Name@@PBD@Z=??0B_ChannelOFile@@QAE@VB_Name@@PBD@Z

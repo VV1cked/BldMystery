@@ -1,6 +1,30 @@
 #define BBLIBC_LIB_EXPORT
 #include "BitMap24.h"
 #include "ODataFile.h"
+#include "Color.h"
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10007090
+* VC++ mangling:          ?GetDimension@B_BitMap24@@QBEXAAH0@Z
+*/
+void B_BitMap24::GetDimension(int &arg_1, int &arg_2) const
+{
+    // Original writes width then height, so aliased outputs end with height.
+    arg_1 = static_cast<int>(dimension1);
+    arg_2 = static_cast<int>(dimension2);
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x100070C0
+* VC++ mangling:          ?GetBits@B_BitMap24@@QBEPBEXZ
+*/
+const unsigned char *B_BitMap24::GetBits() const
+{
+    // Original returns the stored pointer, without allocation or null validation.
+    return static_cast<const unsigned char *>(data);
+}
 
 
 /*
@@ -201,23 +225,40 @@ void B_BitMap24::EscribeArchivoRAW(const char*) const
 * Entry point:            0x100283CD
 * VC++ mangling:          ?ChangeRGBOrder@B_BitMap24@@QAEXXZ
 */
-#ifndef BLD_NATIVE
 void B_BitMap24::ChangeRGBOrder()
 {
+    // Original wraps the dimension product to 32 bits, then compares it as signed.
+    // A zero or negative product skips the buffer entirely; there is no null check.
+    const int count = static_cast<int>(dimension1 * dimension2);
+    unsigned char *pixel = static_cast<unsigned char *>(data);
+    for (int i = 0; i < count; ++i, pixel += 3)
+    {
+        const unsigned char first = pixel[0];
+        pixel[0] = pixel[2];
+        pixel[2] = first;
+    }
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10028434
 * VC++ mangling:          ?GetPixelAt@B_BitMap24@@QBEIHHAAVB_Color@@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_BitMap24::GetPixelAt(int arg_1, int arg_2, B_Color &arg_3) const
 {
-    return 0;
+    // Original compares dimensions as signed and leaves the output untouched on failure.
+    if (arg_1 < 0 || arg_1 >= static_cast<int>(dimension1) ||
+        arg_2 < 0 || arg_2 >= static_cast<int>(dimension2))
+        return 0;
+    // Offset arithmetic wraps to 32 bits. RGB bytes are written directly, with no color hook.
+    const unsigned int offset = 3u * (static_cast<unsigned int>(arg_2) * dimension1 +
+        static_cast<unsigned int>(arg_1));
+    const unsigned char *pixel = static_cast<const unsigned char *>(data) + offset;
+    arg_3.r = pixel[0];
+    arg_3.g = pixel[1];
+    arg_3.b = pixel[2];
+    return 1;
 }
-#endif
 
 
 //B_BitMap24 B_BitMap24::ReadFromJPEG(const char*)

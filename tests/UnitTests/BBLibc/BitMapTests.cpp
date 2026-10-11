@@ -17,3 +17,16 @@ TEST(BitMapTests, Fields)
     EXPECT_OFFSET_EQ(B_BitMap, data, 0x010);
     EXPECT_OFFSET_EQ(B_BitMap, pal, 0x014);
 }
+
+TEST(BitMapTests, BytesPerTexelMapsOriginalTypeCodes)
+{
+    B_BitMap bitmap;
+    const int expected[] = {0, 1, 1, 2, 3, 4, 0, 0};
+    for (unsigned int type = 0; type < 8; ++type)
+    {
+        bitmap.type = static_cast<B_BitMap::BitMapType>(type);
+        EXPECT_EQ(expected[type], bitmap.BytesPerTexel());
+    }
+    bitmap.type = static_cast<B_BitMap::BitMapType>(0xFFFFFFFFu);
+    EXPECT_EQ(0, bitmap.BytesPerTexel());
+}

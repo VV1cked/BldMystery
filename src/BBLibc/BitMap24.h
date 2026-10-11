@@ -90,27 +90,14 @@ public:
     * Entry point:            0x10007090
     * VC++ mangling:          ?GetDimension@B_BitMap24@@QBEXAAH0@Z
     */
-#ifndef BLD_NATIVE
-    void GetDimension(int &arg_1, int &arg_2) const
-    {
-    }
-#else
     void GetDimension(int &arg_1, int &arg_2) const;
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x100070C0
     * VC++ mangling:          ?GetBits@B_BitMap24@@QBEPBEXZ
     */
-#ifndef BLD_NATIVE
-    const unsigned char *GetBits() const
-    {
-        return nullptr;
-    }
-#else
     const unsigned char *GetBits() const;
-#endif
 
     /*
     *
