@@ -1,5 +1,6 @@
 #define BBLIBC_LIB_EXPORT
 #include "Color.h"
+#include "IDataFile.h"
 #include "ODataFile.h"
 
 
@@ -70,25 +71,23 @@ float B_Color::DistanceTo(const B_Color &arg_1)
 * Entry point:            0x100091A4
 * VC++ mangling:          ??5@YAAAVB_IDataFile@@AAV0@AAVB_Color@@@Z
 */
-#ifndef BLD_NATIVE
 B_IDataFile &operator >>(B_IDataFile &file, B_Color &color)
 {
-    return file;
+    // Original reads three separate RGB bytes, leaving the vtable and padding untouched.
+    // It performs no validation or MakeCons call, even after a short read.
+    return file >> color.r >> color.g >> color.b;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x100091DF
 * VC++ mangling:          ??6@YAAAVB_ODataFile@@AAV0@ABVB_Color@@@Z
 */
-#ifndef BLD_NATIVE
 B_ODataFile &operator <<(B_ODataFile &file, B_Color const &color)
 {
-    file.Write(&color, sizeof(B_Color));
-    return file;
+    // Original stores RGB only: no vtable, padding, length prefix, or normalization.
+    return file << color.r << color.g << color.b;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

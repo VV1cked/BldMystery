@@ -72,8 +72,6 @@
 /EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z
 /EXPORT:??1B_BitMap@@UAE@XZ=??1B_BitMap@@UAE@XZ
 /EXPORT:?DistanceTo@B_Color@@QAEMABV1@@Z=?DistanceTo@B_Color@@QAEMABV1@@Z
-/EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_Color@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_Color@@@Z
-/EXPORT:??6@YAAAVB_ODataFile@@AAV0@ABVB_Color@@@Z=??6@YAAAVB_ODataFile@@AAV0@ABVB_Color@@@Z
 /EXPORT:?MakeCons@B_Color@@UAEXXZ=?MakeCons@B_Color@@UAEXXZ
 /EXPORT:??0B_Pal@@QAE@ABV0@@Z=??0B_Pal@@QAE@ABV0@@Z
 /EXPORT:?GetRed@B_Pal@@QBEEI@Z=?GetRed@B_Pal@@QBEEI@Z
