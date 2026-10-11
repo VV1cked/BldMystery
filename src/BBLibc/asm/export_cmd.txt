@@ -33,7 +33,6 @@
 /EXPORT:??4B_ResourceManager@@QAEAAV0@ABV0@@Z=??4B_ResourceManager@@QAEAAV0@ABV0@@Z
 /EXPORT:??DB_Color@@QBE?AV0@M@Z=??DB_Color@@QBE?AV0@M@Z
 /EXPORT:??KB_Color@@QBE?AV0@M@Z=??KB_Color@@QBE?AV0@M@Z
-/EXPORT:??0B_Pal@@QAE@XZ=??0B_Pal@@QAE@XZ
 /EXPORT:??0B_BitMap24@@QAE@HH@Z=??0B_BitMap24@@QAE@HH@Z
 /EXPORT:?Clear@B_BitMap24@@QAEXXZ=?Clear@B_BitMap24@@QAEXXZ
 /EXPORT:??1B_BitMap24@@UAE@XZ=??1B_BitMap24@@UAE@XZ
@@ -51,15 +50,6 @@
 /EXPORT:??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap@@@Z=??6@YAAAVB_ODataFile@@AAV0@ABVB_BitMap@@@Z
 /EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z
 /EXPORT:??1B_BitMap@@UAE@XZ=??1B_BitMap@@UAE@XZ
-/EXPORT:??0B_Pal@@QAE@ABV0@@Z=??0B_Pal@@QAE@ABV0@@Z
-/EXPORT:?GetRed@B_Pal@@QBEEI@Z=?GetRed@B_Pal@@QBEEI@Z
-/EXPORT:?GetGreen@B_Pal@@QBEEI@Z=?GetGreen@B_Pal@@QBEEI@Z
-/EXPORT:?GetBlue@B_Pal@@QBEEI@Z=?GetBlue@B_Pal@@QBEEI@Z
-/EXPORT:?SetRed@B_Pal@@QAEXIE@Z=?SetRed@B_Pal@@QAEXIE@Z
-/EXPORT:?SetGreen@B_Pal@@QAEXIE@Z=?SetGreen@B_Pal@@QAEXIE@Z
-/EXPORT:?SetBlue@B_Pal@@QAEXIE@Z=?SetBlue@B_Pal@@QAEXIE@Z
-/EXPORT:?GetIndex@B_Pal@@QBEIEEEI@Z=?GetIndex@B_Pal@@QBEIEEEI@Z
-/EXPORT:?Id@B_Pal@@QAEABV1@XZ=?Id@B_Pal@@QAEABV1@XZ
 /EXPORT:??0B_BitMap24@@QAE@ABV0@@Z=??0B_BitMap24@@QAE@ABV0@@Z
 /EXPORT:?ClearBitMap24Data@B_BitMap24@@SAXXZ=?ClearBitMap24Data@B_BitMap24@@SAXXZ
 /EXPORT:??0B_BitMap24@@QAE@ABVB_BitMap@@@Z=??0B_BitMap24@@QAE@ABVB_BitMap@@@Z
