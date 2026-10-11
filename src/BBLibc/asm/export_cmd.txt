@@ -26,7 +26,6 @@
 /EXPORT:??8B_Name@@QBEIPBD@Z=??8B_Name@@QBEIPBD@Z
 /EXPORT:??9B_Name@@QBEIABV0@@Z=??9B_Name@@QBEIABV0@@Z
 /EXPORT:??9B_Name@@QBEIPBD@Z=??9B_Name@@QBEIPBD@Z
-/EXPORT:?CompareNoCase@B_Name@@QBEIABV1@@Z=?CompareNoCase@B_Name@@QBEIABV1@@Z
 /EXPORT:??4B_Name@@QAEAAV0@ABV0@@Z=??4B_Name@@QAEAAV0@ABV0@@Z
 /EXPORT:?Right@B_Name@@QBE?AV1@I@Z=?Right@B_Name@@QBE?AV1@I@Z
 /EXPORT:?Left@B_Name@@QBE?AV1@I@Z=?Left@B_Name@@QBE?AV1@I@Z

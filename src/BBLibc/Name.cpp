@@ -149,12 +149,14 @@ unsigned int B_Name::operator !=(const char *str) const
 * Entry point:            0x10003730
 * VC++ mangling:          ?CompareNoCase@B_Name@@QBEIABV1@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::CompareNoCase(const B_Name &arg_1) const
 {
-    return 0;
+    if (this->len != arg_1.len)
+    {
+        return 0;
+    }
+    return stricmp(this->string, arg_1.string) == 0;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

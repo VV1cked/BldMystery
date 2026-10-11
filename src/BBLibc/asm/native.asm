@@ -3526,41 +3526,7 @@ l100036C5 ENDP
 ;
 ;* Export: ?CompareNoCase@B_Name@@QBEIABV1@@Z, 00AA
 ;
-l10003730 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov edx, dword ptr [eax+004h]
-           cmp edx, dword ptr [ecx+004h]
-           jne l10003761
-           mov eax, dword ptr [ebp+008h]
-           mov ecx, dword ptr [eax]
-           push ecx
-           mov edx, dword ptr [ebp-004h]
-           mov eax, dword ptr [edx]
-           push eax
-           call [__imp__stricmp]; [BICRT._stricmp].
-           add esp, 000000008h
-           neg eax
-           sbb eax, eax
-           inc eax
-           jmp l10003763
-;
-;* Jump:
-; 10003743(C) 
-;
-l10003761: xor eax, eax
-;
-;* Jump:
-; 1000375F(U) 
-;
-l10003763: mov esp, ebp
-           pop ebp
-           ret 00004h
-l10003730 ENDP
+           call l10003730; Implemented in c++ code
 ;
 ;* Call:
 ; 10027E3C, 10027E74, 10027EC8, 10027F40, 10027F78, 10027FD0 
