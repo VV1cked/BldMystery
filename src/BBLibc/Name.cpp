@@ -74,6 +74,7 @@ char * const B_Name::String() const
 */
 unsigned int B_Name::operator >(const B_Name &rhs) const
 {
+    // Original ordering ignores stored lengths and compares unsigned bytes up to NUL.
     return strcmp(this->string, rhs.string) > 0;
 }
 
@@ -85,6 +86,7 @@ unsigned int B_Name::operator >(const B_Name &rhs) const
 */
 unsigned int B_Name::operator <(const B_Name &rhs) const
 {
+    // Original ordering ignores stored lengths and compares unsigned bytes up to NUL.
     return strcmp(this->string, rhs.string) < 0;
 }
 
@@ -96,6 +98,7 @@ unsigned int B_Name::operator <(const B_Name &rhs) const
 */
 unsigned int B_Name::operator ==(const B_Name &rhs) const
 {
+    // String() can change the text without updating len; the original checks len first.
     if (this->len != rhs.len)
     {
         return 0;
@@ -111,6 +114,7 @@ unsigned int B_Name::operator ==(const B_Name &rhs) const
 */
 unsigned int B_Name::operator ==(const char *str) const
 {
+    // This overload ignores stored length and stops at the first NUL.
     return strcmp(this->string, str) == 0;
 }
 
@@ -122,10 +126,12 @@ unsigned int B_Name::operator ==(const char *str) const
 */
 unsigned int B_Name::operator !=(const B_Name &rhs) const
 {
+    // Different stored lengths always return 1, regardless of lexical order.
     if (this->len != rhs.len)
     {
         return 1;
     }
+    // The original returns the comparison sign, not a boolean: -1 becomes 0xFFFFFFFFu.
     const int comparison = strcmp(this->string, rhs.string);
     return static_cast<unsigned int>((comparison > 0) - (comparison < 0));
 }
@@ -138,6 +144,7 @@ unsigned int B_Name::operator !=(const B_Name &rhs) const
 */
 unsigned int B_Name::operator !=(const char *str) const
 {
+    // Stored length is ignored; preserve the original 0, 1 or 0xFFFFFFFFu result.
     const int comparison = strcmp(this->string, str);
     return static_cast<unsigned int>((comparison > 0) - (comparison < 0));
 }
@@ -149,6 +156,7 @@ unsigned int B_Name::operator !=(const char *str) const
 */
 unsigned int B_Name::CompareNoCase(const B_Name &arg_1) const
 {
+    // Compare stored lengths first, even if mutable buffers now contain equal text.
     if (this->len != arg_1.len)
     {
         return 0;
@@ -194,11 +202,14 @@ B_Name &B_Name::operator =(const B_Name &src)
 */
 B_Name B_Name::Right(unsigned int count) const
 {
+    // Clamp unsigned count to stored length; UINT_MAX requests the full stored length.
     if (count > len) {
         count = len;
     }
 
     B_Name result(count);
+    // Use stored length for the suffix offset, so it may start after an earlier NUL.
+    // The result keeps count as its length even if strncpy encounters a NUL.
     strncpy(result.string, string + (len - count), count);
     return result;
 }
@@ -211,11 +222,13 @@ B_Name B_Name::Right(unsigned int count) const
 */
 B_Name B_Name::Left(unsigned int count) const
 {
+    // Clamp unsigned count to stored length; UINT_MAX requests the full stored length.
     if (count > len) {
         count = len;
     }
 
     B_Name result(count);
+    // Keep count as the result length even if strncpy stops at an earlier NUL.
     strncpy(result.string, string, count);
     return result;
 }
