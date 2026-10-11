@@ -137,13 +137,13 @@ public:
     */
 #ifndef BLD_NATIVE
 #endif
-    void DeleteList(unsigned int arg_1);
+    void DeleteList(unsigned int deleteElements);
     unsigned int Add(B_ListElement *element);
-    unsigned int AddAfter(B_ListElement *existing, B_ListElement *newElement);
-    unsigned int AddBefore(B_ListElement *existing, B_ListElement *newElement);
-    unsigned int Remove(B_ListElement *element, unsigned int index);
-    B_ListElement *RemoveFirst(unsigned int arg_1);
-    B_ListElement *RemoveLast(unsigned int arg_1);
+    unsigned int AddAfter(B_ListElement *newElement, B_ListElement *existing);
+    unsigned int AddBefore(B_ListElement *newElement, B_ListElement *existing);
+    unsigned int Remove(B_ListElement *element, unsigned int deleteElement);
+    B_ListElement *RemoveFirst(unsigned int deleteElement);
+    B_ListElement *RemoveLast(unsigned int deleteElement);
     B_ListElement *GetAt(unsigned int arg_1);
     unsigned int Exists(const B_ListElement *element);
 

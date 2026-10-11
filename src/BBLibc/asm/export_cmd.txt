@@ -3,13 +3,6 @@
 /EXPORT:??1B_MessageManager@@QAE@XZ=??1B_MessageManager@@QAE@XZ
 /EXPORT:?GetConfigDirectory@@YAPBDXZ=?GetConfigDirectory@@YAPBDXZ
 /EXPORT:?GetCurrentLanguage@@YAPBDXZ=?GetCurrentLanguage@@YAPBDXZ
-/EXPORT:?DeleteList@B_List@@QAEXI@Z=?DeleteList@B_List@@QAEXI@Z
-/EXPORT:?Add@B_List@@QAEIPAVB_ListElement@@@Z=?Add@B_List@@QAEIPAVB_ListElement@@@Z
-/EXPORT:?AddAfter@B_List@@QAEIPAVB_ListElement@@0@Z=?AddAfter@B_List@@QAEIPAVB_ListElement@@0@Z
-/EXPORT:?AddBefore@B_List@@QAEIPAVB_ListElement@@0@Z=?AddBefore@B_List@@QAEIPAVB_ListElement@@0@Z
-/EXPORT:?Remove@B_List@@QAEIPAVB_ListElement@@I@Z=?Remove@B_List@@QAEIPAVB_ListElement@@I@Z
-/EXPORT:?RemoveFirst@B_List@@QAEPAVB_ListElement@@I@Z=?RemoveFirst@B_List@@QAEPAVB_ListElement@@I@Z
-/EXPORT:?RemoveLast@B_List@@QAEPAVB_ListElement@@I@Z=?RemoveLast@B_List@@QAEPAVB_ListElement@@I@Z
 /EXPORT:??_FB_List@@QAEXXZ=??_FB_List@@QAEXXZ
 /EXPORT:?Save@B_Resource@@SAXAAVB_ODataFile@@PBV1@@Z=?Save@B_Resource@@SAXAAVB_ODataFile@@PBV1@@Z
 /EXPORT:?Load@B_Resource@@SAPAV1@AAVB_IDataFile@@G@Z=?Load@B_Resource@@SAPAV1@AAVB_IDataFile@@G@Z
