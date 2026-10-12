@@ -4,6 +4,24 @@
 #include "Color.h"
 #include <new>
 #include <cstdio>
+#include <cstring>
+#include <cassert>
+
+static void CopyBitmap24Bytes(void *destination, const void *source, unsigned int size)
+{
+    // Original copies forward in dwords, then bytes; overlapping buffers are not memmove.
+    byte *out = static_cast<byte *>(destination);
+    const byte *in = static_cast<const byte *>(source);
+    unsigned int offset = 0;
+    for (unsigned int i = 0; i < size / 4u; ++i, offset += 4)
+    {
+        unsigned int word;
+        std::memcpy(&word, in + offset, 4);
+        std::memcpy(out + offset, &word, 4);
+    }
+    for (unsigned int i = 0; i < size % 4u; ++i, ++offset)
+        out[offset] = in[offset];
+}
 
 /*
 * Module:                 BBLibc.dll
@@ -122,24 +140,49 @@ B_BitMap24::B_BitMap24(const B_BitMap &arg_1)
 * Entry point:            0x100271BE
 * VC++ mangling:          ??4B_BitMap24@@QAEAAV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_BitMap24 &B_BitMap24::operator=(const B_BitMap24 &that)
 {
+    // Equal dimensions reuse the current buffer, including self-assignment and zero dimensions.
+    if (dimension1 != that.dimension1 || dimension2 != that.dimension2)
+    {
+        dimension1 = that.dimension1;
+        dimension2 = that.dimension2;
+        ::operator delete(data);
+        // Only the resize branch normalizes either zero dimension to an entirely empty image.
+        if (!dimension1 || !dimension2)
+        {
+            dimension2 = dimension1 = 0;
+            data = nullptr;
+            return *this;
+        }
+        data = ::operator new(dimension1 * dimension2 * 3u);
+    }
+    // The original byte count wraps to 32 bits and does not validate source storage.
+    CopyBitmap24Bytes(data, that.data, dimension1 * dimension2 * 3u);
     return *this;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x100272A5
 * VC++ mangling:          ?SetBits@B_BitMap24@@QAEIHHPBD0@Z
 */
-#ifndef BLD_NATIVE
-unsigned int B_BitMap24::SetBits(int, int, const char*, const char*)
+unsigned int B_BitMap24::SetBits(int width, int height, const char *bits, const char *format)
 {
-    return 0;
+    // Original compares exactly four bytes, including the terminator; unsupported formats do nothing.
+    if (std::memcmp(format, "RGB", 4) != 0) return 0;
+    if (dimension1 != static_cast<unsigned int>(width) || dimension2 != static_cast<unsigned int>(height))
+    {
+        ::operator delete(data);
+        dimension1 = static_cast<unsigned int>(width);
+        dimension2 = static_cast<unsigned int>(height);
+        // Unlike assignment, a zero dimension is retained and still requests a zero-byte allocation.
+        data = ::operator new(dimension1 * dimension2 * 3u);
+        if (!data) _assert("Bits", "C:\\code\\BITMAP24\\BITMAP24.CPP", 141);
+    }
+    CopyBitmap24Bytes(data, bits, dimension1 * dimension2 * 3u);
+    return 1;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

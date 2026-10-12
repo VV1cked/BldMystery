@@ -102,3 +102,74 @@ TEST(BitMap24Tests, ClearZerosDimensionsEvenWhenDataIsNull)
     EXPECT_EQ(nullptr, bitmap.data);
     EXPECT_EQ(0u, bitmap.dimension1); EXPECT_EQ(0u, bitmap.dimension2);
 }
+
+TEST(BitMap24Tests, AssignmentReusesBufferAndSupportsSelfAssignment)
+{
+    B_BitMap24 source, target;
+    byte pixels[] = {1,2,3,4,5,6};
+    source.dimension1 = target.dimension1 = 2; source.dimension2 = target.dimension2 = 1;
+    source.data = pixels; target.data = ::operator new(6);
+    void *oldData = target.data;
+    EXPECT_EQ(&target, &(target = source)); EXPECT_EQ(oldData, target.data);
+    EXPECT_EQ(0, std::memcmp(target.data, pixels, 6));
+    EXPECT_EQ(&target, &(target = target)); EXPECT_EQ(oldData, target.data);
+    EXPECT_EQ(0, std::memcmp(target.data, pixels, 6));
+    source.data = nullptr; target.Clear();
+}
+
+TEST(BitMap24Tests, AssignmentResizesAndNormalizesZeroOnlyWhenDimensionsDiffer)
+{
+    B_BitMap24 source, target;
+    byte pixels[] = {1,2,3,4,5,6};
+    source.dimension1 = 2; source.dimension2 = 1; source.data = pixels;
+    target.dimension1 = target.dimension2 = 1; target.data = ::operator new(3);
+    target = source; EXPECT_EQ(2u, target.dimension1); EXPECT_EQ(1u, target.dimension2);
+    EXPECT_EQ(0, std::memcmp(target.data, pixels, 6));
+    source.dimension1 = 0; source.dimension2 = 7; source.data = nullptr;
+    target = source; EXPECT_EQ(0u, target.dimension1); EXPECT_EQ(0u, target.dimension2); EXPECT_EQ(nullptr, target.data);
+    target.dimension2 = 7; target = source;
+    EXPECT_EQ(7u, target.dimension2); EXPECT_EQ(nullptr, target.data);
+}
+
+TEST(BitMap24Tests, SetBitsChecksExactFormatAndReusesBuffer)
+{
+    B_BitMap24 target;
+    byte pixels[] = {1,2,3,4,5,6};
+    target.dimension1 = 2; target.dimension2 = 1; target.data = ::operator new(6);
+    std::memset(target.data, 0xA5, 6); void *oldData = target.data;
+    const char badFormats[][4] = {{'B','G','R',0}, {'R','G','B','X'}, {'r','g','b',0}};
+    for (const auto &format : badFormats)
+    {
+        EXPECT_EQ(0u, target.SetBits(99, 88, nullptr, format));
+        EXPECT_EQ(oldData, target.data); EXPECT_EQ(2u, target.dimension1); EXPECT_EQ(1u, target.dimension2);
+        EXPECT_EQ(0xA5, static_cast<byte *>(target.data)[0]);
+    }
+    EXPECT_EQ(1u, target.SetBits(2, 1, reinterpret_cast<const char *>(pixels), "RGB"));
+    EXPECT_EQ(oldData, target.data); EXPECT_EQ(0, std::memcmp(target.data, pixels, 6));
+    target.Clear();
+}
+
+TEST(BitMap24Tests, SetBitsResizesRetainsZeroDimensionsAndUsesWrappedSize)
+{
+    B_BitMap24 target; target.dimension1 = target.dimension2 = 0; target.data = nullptr;
+    const char pixels[] = {1,2,3,4,5,6};
+    EXPECT_EQ(1u, target.SetBits(static_cast<int>(0x80000001u), 2, pixels, "RGB"));
+    EXPECT_EQ(0x80000001u, target.dimension1); EXPECT_EQ(2u, target.dimension2);
+    EXPECT_EQ(0, std::memcmp(target.data, pixels, 6));
+    EXPECT_EQ(1u, target.SetBits(0, 7, nullptr, "RGB"));
+    EXPECT_EQ(0u, target.dimension1); EXPECT_EQ(7u, target.dimension2);
+    ASSERT_NE(nullptr, target.data);
+    void *zeroAllocation = target.data;
+    EXPECT_EQ(1u, target.SetBits(0, 7, nullptr, "RGB")); EXPECT_EQ(zeroAllocation, target.data);
+    target.Clear();
+}
+
+TEST(BitMap24Tests, SetBitsPreservesOriginalForwardDwordOverlap)
+{
+    B_BitMap24 target; byte pixels[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    target.dimension1 = 4; target.dimension2 = 1; target.data = pixels + 3;
+    const byte expected[] = {1,2,3,1,2,3,4,2,3,4,8,3,4,8,12};
+    EXPECT_EQ(1u, target.SetBits(4, 1, reinterpret_cast<const char *>(pixels), "RGB"));
+    EXPECT_EQ(0, std::memcmp(pixels, expected, sizeof(pixels)));
+    target.data = nullptr;
+}
