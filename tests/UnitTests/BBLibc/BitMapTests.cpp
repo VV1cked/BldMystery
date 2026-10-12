@@ -6,8 +6,10 @@
 #include <cstring>
 #include <new>
 #include <fcntl.h>
+#include <vector>
 #define private public
 #include <BBLibc/ODataFile.h>
+#include <BBLibc/IDataFile.h>
 #undef private
 
 
@@ -227,4 +229,82 @@ TEST(BitMapTests, SerializationUsesWrappedByteCount)
     output << bitmap;
     ASSERT_EQ(18u, output.posInCacheBlock);
     EXPECT_EQ(0, std::memcmp(bitmap.data, output.fileCache + 12, 6));
+}
+
+static void InitializeBitmapInputCache(B_IDataFile &input, const std::vector<byte> &bytes)
+{
+    input.file_size = static_cast<unsigned int>(bytes.size());
+    input.cacheBlockStartPos = input.posInCacheBlock = 0;
+    std::memcpy(input.fileCache, bytes.data(), bytes.size());
+}
+
+TEST(BitMapTests, DeserializationReadsAllFormatsAndReplacesOldStorage)
+{
+    B_Pal palette; std::memset(&palette, 0xA5, sizeof(palette));
+    const unsigned int bytesPerPixel[] = {0, 1, 1, 2, 3, 4};
+    for (unsigned int type = 1; type <= 5; ++type)
+    {
+        const unsigned int size = 6 * bytesPerPixel[type];
+        const unsigned int palSize = type == 1 || type == 3 ? 768 : 0;
+        std::vector<byte> bytes(12 + size + palSize);
+        const unsigned int header[] = {type, 2, 3}; std::memcpy(bytes.data(), header, 12);
+        for (unsigned int i = 12; i < bytes.size(); ++i) bytes[i] = static_cast<byte>(i);
+        B_IDataFile input; InitializeBitmapInputCache(input, bytes);
+        B_BitMap bitmap(B_BitMap::BitMapType4, 1, 1, &palette);
+        EXPECT_EQ(&input, &(input >> bitmap));
+        EXPECT_EQ(type, static_cast<unsigned int>(bitmap.type));
+        EXPECT_EQ(2u, bitmap.dimension1); EXPECT_EQ(3u, bitmap.dimension2);
+        ASSERT_NE(nullptr, bitmap.data);
+        EXPECT_EQ(0, std::memcmp(bytes.data() + 12, bitmap.data, size));
+        if (palSize)
+        {
+            ASSERT_NE(nullptr, bitmap.pal);
+            EXPECT_EQ(0, std::memcmp(bytes.data() + 12 + size, bitmap.pal, palSize));
+        }
+        else EXPECT_EQ(nullptr, bitmap.pal);
+        EXPECT_EQ(static_cast<long>(bytes.size()), input.Tell());
+    }
+}
+
+TEST(BitMapTests, UnknownInputTypeClearsStorageButKeepsDimensions)
+{
+    B_Pal palette; std::memset(&palette, 0xA5, sizeof(palette));
+    B_BitMap bitmap(B_BitMap::BitMapType4, 1, 1, &palette);
+    const unsigned int header[] = {0xFFFFFFFFu, 99, 88};
+    std::vector<byte> bytes(13, 0x5A); std::memcpy(bytes.data(), header, 12);
+    B_IDataFile input; InitializeBitmapInputCache(input, bytes);
+    input >> bitmap;
+    EXPECT_EQ(0, static_cast<int>(bitmap.type));
+    EXPECT_EQ(99u, bitmap.dimension1); EXPECT_EQ(88u, bitmap.dimension2);
+    EXPECT_EQ(nullptr, bitmap.data); EXPECT_EQ(nullptr, bitmap.pal);
+    EXPECT_EQ(12, input.Tell());
+}
+
+TEST(BitMapTests, ShortPayloadReadsAvailableBytesWithoutChangingDeclaredDimensions)
+{
+    const unsigned int header[] = {4, 2, 1};
+    std::vector<byte> bytes(15, 0x5A); std::memcpy(bytes.data(), header, 12);
+    B_IDataFile input; InitializeBitmapInputCache(input, bytes);
+    B_BitMap bitmap; input >> bitmap;
+    EXPECT_EQ(B_BitMap::BitMapType4, bitmap.type);
+    EXPECT_EQ(2u, bitmap.dimension1); EXPECT_EQ(1u, bitmap.dimension2);
+    ASSERT_NE(nullptr, bitmap.data);
+    EXPECT_EQ(0, std::memcmp(bytes.data() + 12, bitmap.data, 3));
+    EXPECT_EQ(15, input.Tell());
+    // The remaining three allocation bytes are intentionally not read by this test.
+}
+
+TEST(BitMapTests, ShortDimensionsRetainUnreadBytesForUnknownType)
+{
+    const unsigned int type = 99;
+    std::vector<byte> bytes(6); std::memcpy(bytes.data(), &type, 4);
+    bytes[4] = 1; bytes[5] = 2;
+    B_IDataFile input; InitializeBitmapInputCache(input, bytes);
+    B_BitMap bitmap;
+    bitmap.dimension1 = 0x11220000u; bitmap.dimension2 = 88;
+    input >> bitmap;
+    EXPECT_EQ(0, static_cast<int>(bitmap.type));
+    EXPECT_EQ(0x11220201u, bitmap.dimension1); EXPECT_EQ(88u, bitmap.dimension2);
+    EXPECT_EQ(nullptr, bitmap.data); EXPECT_EQ(nullptr, bitmap.pal);
+    EXPECT_EQ(6, input.Tell());
 }

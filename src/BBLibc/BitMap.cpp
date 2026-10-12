@@ -2,6 +2,8 @@
 #include "BitMap.h"
 #include "BitMap24.h"
 #include "ODataFile.h"
+#include "IDataFile.h"
+#include <cassert>
 #include <new>
 #include <cstring>
 
@@ -142,12 +144,42 @@ B_ODataFile &operator <<(B_ODataFile &file, B_BitMap const &bitMap)
 * Entry point:            0x10008C9B
 * VC++ mangling:          ??5@YAAAVB_IDataFile@@AAV0@AAVB_BitMap@@@Z
 */
-#ifndef BLD_NATIVE
 B_IDataFile &operator >>(B_IDataFile &file, B_BitMap &bitMap)
 {
+    // Original discards old storage before reading even the first header field.
+    if (bitMap.data)
+    {
+        ::operator delete(bitMap.data);
+        bitMap.data = nullptr;
+    }
+    if (bitMap.pal)
+    {
+        ::operator delete(bitMap.pal);
+        bitMap.pal = nullptr;
+    }
+    // A complete type field is required; original leaves this local uninitialized on short input.
+    unsigned long type;
+    file >> type >> bitMap.dimension1 >> bitMap.dimension2;
+    bitMap.type = static_cast<B_BitMap::BitMapType>(type >= 1u && type <= 5u ? type : 0u);
+    if (bitMap.data)
+        _assert("b.texels==NULL", "C:\\code\\BITMAP\\BITMAP.CPP", 188);
+    // Original normalizes unknown types but preserves dimensions and reads no payload for them.
+    if (type >= 1u && type <= 5u)
+    {
+        const unsigned int size = bitMap.dimension1 * bitMap.dimension2 *
+            static_cast<unsigned int>(bitMap.BytesPerTexel());
+        bitMap.data = ::operator new(size);
+        file.Read(bitMap.data, size);
+        if (type == 1u || type == 3u)
+        {
+            void *storage = ::operator new(sizeof(B_Pal));
+            bitMap.pal = storage ? new (storage) B_Pal : nullptr;
+            file.Read(bitMap.pal, sizeof(B_Pal));
+        }
+        // There is no short-read repair: unread bytes of these new allocations remain untouched.
+    }
     return file;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
