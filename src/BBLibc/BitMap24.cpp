@@ -2,6 +2,7 @@
 #include "BitMap24.h"
 #include "ODataFile.h"
 #include "Color.h"
+#include "BitMap.h"
 #include <new>
 #include <cstdio>
 #include <cstring>
@@ -71,7 +72,7 @@ const unsigned char *B_BitMap24::GetBits() const
 * VC++ mangling:          ?BitMap24DataList@B_BitMap24@@0V?$B_Array@VB_BitMap24@@@@A
 */
 #ifndef BLD_NATIVE
-B_Array<B_BitMap24> B_BitMap24::BitMap24DataList(1);
+B_Array<B_BitMap24> B_BitMap24::BitMap24DataList(16);
 #endif
 
 
@@ -80,12 +81,15 @@ B_Array<B_BitMap24> B_BitMap24::BitMap24DataList(1);
 * Entry point:            0x10006CB0
 * VC++ mangling:          ??0B_BitMap24@@QAE@HH@Z
 */
-#ifndef BLD_NATIVE
 B_BitMap24::B_BitMap24(int width, int height)
 {
-
+    // Original registers this before initializing dimensions or allocating pixels.
+    BitMap24DataList.push_back(this);
+    dimension1 = static_cast<unsigned int>(width);
+    dimension2 = static_cast<unsigned int>(height);
+    // Zero dimensions are retained; only two nonzero dimensions cause allocation.
+    data = width && height ? ::operator new(dimension1 * dimension2 * 3u) : nullptr;
 }
-#endif
 
 
 /*
@@ -93,12 +97,12 @@ B_BitMap24::B_BitMap24(int width, int height)
 * Entry point:            0x10006E70
 * VC++ mangling:          ??1B_BitMap24@@UAE@XZ
 */
-#ifndef BLD_NATIVE
 B_BitMap24::~B_BitMap24()
 {
-
+    // Unregister first; buffers use scalar delete and the fields are not cleared afterward.
+    BitMap24DataList.remove(this);
+    if (data) ::operator delete(data);
 }
-#endif
 
 
 /*
@@ -106,34 +110,79 @@ B_BitMap24::~B_BitMap24()
 * Entry point:            0x10026AD5
 * VC++ mangling:          ??0B_BitMap24@@QAE@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_BitMap24::B_BitMap24(const B_BitMap24 &that)
 {
+    BitMap24DataList.push_back(this);
+    dimension1 = that.dimension1;
+    dimension2 = that.dimension2;
+    data = nullptr;
+    if (dimension1 && dimension2)
+    {
+        const unsigned int size = dimension1 * dimension2 * 3u;
+        data = ::operator new(size);
+        CopyBitmap24Bytes(data, that.data, size);
+    }
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10026C70
 * VC++ mangling:          ?ClearBitMap24Data@B_BitMap24@@SAXXZ
 */
-#ifndef BLD_NATIVE
 void B_BitMap24::ClearBitMap24Data()
 {
-
+    // Original releases pixels and forgets registered objects, keeping their dimensions intact.
+    for (unsigned int i = 0; i < BitMap24DataList.size(); ++i)
+    {
+        B_BitMap24 *bitmap = BitMap24DataList[i];
+        ::operator delete(bitmap->data);
+        bitmap->data = nullptr;
+    }
+    BitMap24DataList.clear();
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10026D6D
 * VC++ mangling:          ??0B_BitMap24@@QAE@ABVB_BitMap@@@Z
 */
-#ifndef BLD_NATIVE
 B_BitMap24::B_BitMap24(const B_BitMap &arg_1)
 {
+    BitMap24DataList.push_back(this);
+    dimension1 = dimension2 = 0;
+    data = nullptr;
+    // Original accepts indexed, grayscale and RGB only; types 3 and 5 become empty.
+    const unsigned int type = static_cast<unsigned int>(arg_1.type);
+    if (!arg_1.dimension1 || !arg_1.dimension2 ||
+        (type != 1u && type != 2u && type != 4u)) return;
+    dimension1 = arg_1.dimension1;
+    dimension2 = arg_1.dimension2;
+    data = ::operator new(dimension1 * dimension2 * 3u);
+    if (!data) { dimension2 = dimension1 = 0; return; }
+    const byte *source = static_cast<const byte *>(arg_1.data);
+    if (type == 4u)
+        CopyBitmap24Bytes(data, source, dimension1 * dimension2 * 3u);
+    else
+    {
+        byte *destination = static_cast<byte *>(data);
+        // Original uses signed row/column bounds, even though the stored dimensions are unsigned.
+        for (int y = 0; y < static_cast<int>(dimension2); ++y)
+            for (int x = 0; x < static_cast<int>(dimension1); ++x, ++source)
+                if (type == 1u)
+                {
+                    // Palette components are doubled and truncated to a byte, without saturation.
+                    *destination++ = static_cast<byte>(arg_1.pal->GetRed(*source) * 2u);
+                    *destination++ = static_cast<byte>(arg_1.pal->GetGreen(*source) * 2u);
+                    *destination++ = static_cast<byte>(arg_1.pal->GetBlue(*source) * 2u);
+                }
+                else
+                {
+                    *destination++ = *source;
+                    *destination++ = *source;
+                    *destination++ = *source;
+                }
+    }
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

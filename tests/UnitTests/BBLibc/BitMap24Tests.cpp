@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 #include <Utils/FieldOffset.h>
 #include <bld_system.h>
+#define private public
 #include <BBLibc/BitMap24.h>
+#undef private
+#include <BBLibc/BitMap.h>
 #include <BBLibc/Color.h>
 #include <cstring>
 #include <new>
@@ -172,4 +175,79 @@ TEST(BitMap24Tests, SetBitsPreservesOriginalForwardDwordOverlap)
     EXPECT_EQ(1u, target.SetBits(4, 1, reinterpret_cast<const char *>(pixels), "RGB"));
     EXPECT_EQ(0, std::memcmp(pixels, expected, sizeof(pixels)));
     target.data = nullptr;
+}
+
+TEST(BitMap24Tests, RegistryLayoutMatchesPointerArray)
+{
+    EXPECT_EQ(24u, sizeof(B_Array<B_BitMap24>));
+    EXPECT_OFFSET_EQ(B_Array<B_BitMap24>, data_, 4);
+    EXPECT_OFFSET_EQ(B_Array<B_BitMap24>, size_, 8);
+    EXPECT_OFFSET_EQ(B_Array<B_BitMap24>, increment_, 12);
+    EXPECT_OFFSET_EQ(B_Array<B_BitMap24>, capacity_, 16);
+    EXPECT_OFFSET_EQ(B_Array<B_BitMap24>, deleteItems_, 20);
+}
+
+TEST(BitMap24Tests, ConstructionRetainsZeroDimensionsAndWrapsAllocationSize)
+{
+    B_BitMap24 zero(0, 7), wrapped(static_cast<int>(0x80000001u), 2);
+    EXPECT_EQ(0u, zero.dimension1); EXPECT_EQ(7u, zero.dimension2); EXPECT_EQ(nullptr, zero.data);
+    EXPECT_EQ(0x80000001u, wrapped.dimension1); EXPECT_EQ(2u, wrapped.dimension2);
+    ASSERT_NE(nullptr, wrapped.data); std::memset(wrapped.data, 0xA5, 6);
+    B_BitMap24 copy(wrapped); ASSERT_NE(nullptr, copy.data); EXPECT_NE(wrapped.data, copy.data);
+    EXPECT_EQ(0, std::memcmp(wrapped.data, copy.data, 6));
+    B_BitMap24 zeroCopy(zero); EXPECT_EQ(7u, zeroCopy.dimension2); EXPECT_EQ(nullptr, zeroCopy.data);
+}
+
+TEST(BitMap24Tests, ConversionSupportsIndexedGrayAndRgbOnly)
+{
+    B_Pal palette; std::memset(&palette, 0, sizeof(palette));
+    palette.SetRed(1, 200); palette.SetGreen(1, 130); palette.SetBlue(1, 127);
+    for (unsigned int type = 1; type <= 5; ++type)
+    {
+        B_BitMap source(static_cast<B_BitMap::BitMapType>(type), 1, 1, &palette);
+        byte *pixels = static_cast<byte *>(source.data); pixels[0] = 1;
+        if (type == 4) { pixels[1] = 2; pixels[2] = 3; }
+        B_BitMap24 target(source);
+        if (type == 3 || type == 5)
+        {
+            EXPECT_EQ(0u, target.dimension1); EXPECT_EQ(0u, target.dimension2); EXPECT_EQ(nullptr, target.data);
+        }
+        else
+        {
+            ASSERT_NE(nullptr, target.data);
+            const byte indexed[] = {144, 4, 254}, gray[] = {1,1,1}, rgb[] = {1,2,3};
+            EXPECT_EQ(0, std::memcmp(target.data, type == 1 ? indexed : type == 2 ? gray : rgb, 3));
+        }
+    }
+}
+
+TEST(BitMap24Tests, RegistryGrowsShrinksAndPreservesOrder)
+{
+    B_Array<B_BitMap24> registry;
+    ASSERT_EQ(0u, registry.size());
+    B_BitMap24 *objects[18];
+    for (unsigned int i = 0; i < 18; ++i) { objects[i] = new B_BitMap24; registry.push_back(objects[i]); }
+    EXPECT_EQ(18u, registry.size()); EXPECT_EQ(32u, registry.capacity_); EXPECT_EQ(16u, registry.increment_);
+    registry.remove(objects[8]); delete objects[8];
+    EXPECT_EQ(17u, registry.size()); EXPECT_EQ(32u, registry.capacity_); // No shrink at size 18.
+    registry.remove(objects[9]); delete objects[9];
+    EXPECT_EQ(16u, registry.size()); EXPECT_EQ(16u, registry.capacity_);
+    EXPECT_EQ(objects[10], registry[8]);
+    for (unsigned int i = 0; i < 18; ++i) if (i != 8 && i != 9) { registry.remove(objects[i]); delete objects[i]; }
+    EXPECT_EQ(0u, registry.size()); EXPECT_EQ(0u, registry.capacity_); EXPECT_EQ(nullptr, registry.data_);
+}
+
+TEST(BitMap24Tests, GlobalClearKeepsDimensionsAndForgetsLiveObjects)
+{
+    B_BitMap24 old(2, 3); std::memset(old.data, 0xA5, 18);
+    B_BitMap24 copy(old);
+    B_BitMap24::ClearBitMap24Data();
+    EXPECT_EQ(2u, old.dimension1); EXPECT_EQ(3u, old.dimension2); EXPECT_EQ(nullptr, old.data);
+    EXPECT_EQ(nullptr, copy.data);
+    const char pixels[18] = {};
+    EXPECT_EQ(1u, old.SetBits(3, 2, pixels, "RGB"));
+    B_BitMap24 fresh(1, 1);
+    B_BitMap24::ClearBitMap24Data();
+    EXPECT_EQ(nullptr, fresh.data); ASSERT_NE(nullptr, old.data); // The old object is no longer registered.
+    old.Clear();
 }
