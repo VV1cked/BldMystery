@@ -9135,26 +9135,7 @@ l10007D30 ENDP
 ;
 ;* Export: ??4B_RDataLight@@QAEAAV0@ABV0@@Z, 004B
 ;
-l10007EF0 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+008h]
-           mov ecx, dword ptr [ebp-004h]
-           mov edx, dword ptr [eax]
-           mov dword ptr [ecx], edx
-           mov edx, dword ptr [eax+004h]
-           mov dword ptr [ecx+004h], edx
-           mov edx, dword ptr [eax+008h]
-           mov dword ptr [ecx+008h], edx
-           mov eax, dword ptr [eax+00Ch]
-           mov dword ptr [ecx+00Ch], eax
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10007EF0 ENDP
+           call l10007EF0; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -9163,20 +9144,7 @@ l10007EF0 ENDP
 ;
 ;* Export: ??4B_RItem@@QAEAAV0@ABV0@@Z, 004D
 ;
-l10007F20 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+008h]
-           mov ecx, dword ptr [eax]
-           mov edx, dword ptr [ebp-004h]
-           mov dword ptr [edx], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10007F20 ENDP
+           call l10007F20; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -9187,24 +9155,7 @@ l10007F20 ENDP
 ;
 ;* Export: ??4B_RDataTriangle@@QAEAAV0@ABV0@@Z, 004C
 ;
-l10007F40 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           push esi
-           push edi
-           mov dword ptr [ebp-004h], ecx
-           mov esi, dword ptr [ebp+008h]
-           mov ecx, 000000007h
-           mov edi, dword ptr [ebp-004h]
-           rep movsd
-           mov eax, dword ptr [ebp-004h]
-           pop edi
-           pop esi
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10007F40 ENDP
+           call l10007F40; Implemented in c++ code
 ;
            int 03h
            int 03h
@@ -99962,85 +99913,15 @@ l10040A5E ENDP
 ;
 ;* Export: ??0B_RDataLight@@QAE@XZ, 0026
 ;
-l10040CB0 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10040CB0 ENDP
+           call l10040CB0; Implemented in c++ code
 ;
 ;* Export: ??0B_RDataLight@@QAE@MMMM@Z, 0025
 ;
-l10040CBE PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+008h]
-           mov dword ptr [ebp+008h], eax
-           mov ecx, dword ptr [ebp+00Ch]
-           mov dword ptr [ebp+00Ch], ecx
-           mov edx, dword ptr [ebp+010h]
-           mov dword ptr [ebp+010h], edx
-           mov eax, dword ptr [ebp+014h]
-           mov dword ptr [ebp+014h], eax
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00010h
-l10040CBE ENDP
+           call l10040CBE; Implemented in c++ code
 ;
 ;* Export: ?Interp@B_RDataLight@@QAEXNAAV1@N0@Z, 00D7
 ;
-l10040CE6 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp+010h]
-           fld dword ptr [eax]
-           fmul qword ptr [ebp+008h]
-           mov ecx, dword ptr [ebp+01Ch]
-           fld dword ptr [ecx]
-           fmul qword ptr [ebp+014h]
-           faddp st(01h), st(00h)
-           mov edx, dword ptr [ebp-004h]
-           fstp dword ptr [edx]
-           mov eax, dword ptr [ebp+010h]
-           fld dword ptr [eax+004h]
-           fmul qword ptr [ebp+008h]
-           mov ecx, dword ptr [ebp+01Ch]
-           fld dword ptr [ecx+004h]
-           fmul qword ptr [ebp+014h]
-           faddp st(01h), st(00h)
-           mov edx, dword ptr [ebp-004h]
-           fstp dword ptr [edx+004h]
-           mov eax, dword ptr [ebp+010h]
-           fld dword ptr [eax+008h]
-           fmul qword ptr [ebp+008h]
-           mov ecx, dword ptr [ebp+01Ch]
-           fld dword ptr [ecx+008h]
-           fmul qword ptr [ebp+014h]
-           faddp st(01h), st(00h)
-           mov edx, dword ptr [ebp-004h]
-           fstp dword ptr [edx+008h]
-           mov eax, dword ptr [ebp+010h]
-           fld dword ptr [eax+00Ch]
-           fmul qword ptr [ebp+008h]
-           mov ecx, dword ptr [ebp+01Ch]
-           fld dword ptr [ecx+00Ch]
-           fmul qword ptr [ebp+014h]
-           faddp st(01h), st(00h)
-           mov edx, dword ptr [ebp-004h]
-           fstp dword ptr [edx+00Ch]
-           mov esp, ebp
-           pop ebp
-           ret 00018h
-l10040CE6 ENDP
+           call l10040CE6; Implemented in c++ code
 ;
 ;* Call:
 ; 100323AE 
@@ -100246,35 +100127,11 @@ l10040E61 ENDP
 ;
 ;* Export: ??0B_RItem@@QAE@K@Z, 0028
 ;
-l10040F39 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov ecx, dword ptr [ebp+008h]
-           mov dword ptr [eax], ecx
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret 00004h
-l10040F39 ENDP
+           call l10040F39; Implemented in c++ code
 ;
 ;* Export: ??0B_RDataTriangle@@QAE@XZ, 0027
 ;
-l10040F51 PROC
-           push ebp
-           mov ebp, esp
-           push ecx
-           mov dword ptr [ebp-004h], ecx
-           push 000000001h
-           mov ecx, dword ptr [ebp-004h]
-           call l10040F39
-           mov eax, dword ptr [ebp-004h]
-           mov esp, ebp
-           pop ebp
-           ret
-l10040F51 ENDP
+           call l10040F51; Implemented in c++ code
 ;
 ;* Export: ??0B_ParticleGType@@QAE@ABVB_Name@@0KI@Z, 0024
 ;

@@ -31,9 +31,6 @@
 /EXPORT:?SavePackedData@B_ResourceManager@@QAEHHPBD@Z=l1000629C
 /EXPORT:?LoadPackedData@B_ResourceManager@@QAEHHPBD@Z=l1000644A
 /EXPORT:??4B_ResourceManager@@QAEAAV0@ABV0@@Z=??4B_ResourceManager@@QAEAAV0@ABV0@@Z
-/EXPORT:??4B_RDataLight@@QAEAAV0@ABV0@@Z=??4B_RDataLight@@QAEAAV0@ABV0@@Z
-/EXPORT:??4B_RItem@@QAEAAV0@ABV0@@Z=??4B_RItem@@QAEAAV0@ABV0@@Z
-/EXPORT:??4B_RDataTriangle@@QAEAAV0@ABV0@@Z=??4B_RDataTriangle@@QAEAAV0@ABV0@@Z
 /EXPORT:?SaveToBMP@B_BitMap24@@QBEHPBD@Z=?SaveToBMP@B_BitMap24@@QBEHPBD@Z
 /EXPORT:?SaveToBMPSized@B_BitMap24@@QBEHPBDHH@Z=?SaveToBMPSized@B_BitMap24@@QBEHPBDHH@Z
 /EXPORT:?ReadFromBMP@B_BitMap24@@QAEHPBD@Z=?ReadFromBMP@B_BitMap24@@QAEHPBD@Z
@@ -76,11 +73,6 @@
 /EXPORT:?ReadCSV@@YAIPBDPAV?$B_NDataBase@UB_ElementCSV@@@@@Z=?ReadCSV@@YAIPBDPAV?$B_NDataBase@UB_ElementCSV@@@@@Z
 /EXPORT:?CallPythonObject@@YAPAUPyObject@@PAU1@0@Z=?CallPythonObject@@YAPAUPyObject@@PAU1@0@Z
 /EXPORT:initBBLibc=l100407BF
-/EXPORT:??0B_RDataLight@@QAE@XZ=??0B_RDataLight@@QAE@XZ
-/EXPORT:??0B_RDataLight@@QAE@MMMM@Z=??0B_RDataLight@@QAE@MMMM@Z
-/EXPORT:?Interp@B_RDataLight@@QAEXNAAV1@N0@Z=?Interp@B_RDataLight@@QAEXNAAV1@N0@Z
-/EXPORT:??0B_RItem@@QAE@K@Z=??0B_RItem@@QAE@K@Z
-/EXPORT:??0B_RDataTriangle@@QAE@XZ=??0B_RDataTriangle@@QAE@XZ
 /EXPORT:??0B_ParticleGType@@QAE@ABVB_Name@@0KI@Z=??0B_ParticleGType@@QAE@ABVB_Name@@0KI@Z
 /EXPORT:??1B_ParticleGType@@UAE@XZ=??1B_ParticleGType@@UAE@XZ
 /EXPORT:??5@YAAAVB_IDataFile@@AAV0@AAVB_ParticleGType@@@Z=??5@YAAAVB_IDataFile@@AAV0@AAVB_ParticleGType@@@Z
