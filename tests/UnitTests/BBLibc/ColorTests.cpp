@@ -206,6 +206,41 @@ TEST(ColorTests, DistanceToReturnsSquaredDistance)
     EXPECT_FLOAT_EQ(195075.0F, white.DistanceTo(black));
 }
 
+TEST(ColorTests, ScalingTruncatesAndWrapsChannels)
+{
+    const B_Color source(100, 132, 155);
+    const B_Color half = source / 2.0F;
+    EXPECT_EQ(50, half.r);
+    EXPECT_EQ(66, half.g);
+    EXPECT_EQ(77, half.b);
+    const B_Color doubled = source * 2.0F;
+    EXPECT_EQ(200, doubled.r);
+    EXPECT_EQ(8, doubled.g);
+    EXPECT_EQ(54, doubled.b);
+    const B_Color negative = source * -0.5F;
+    EXPECT_EQ(206, negative.r);
+    EXPECT_EQ(190, negative.g);
+    EXPECT_EQ(179, negative.b);
+    EXPECT_EQ(100, source.r);
+    EXPECT_EQ(132, source.g);
+    EXPECT_EQ(155, source.b);
+}
+
+TEST(ColorTests, ScalingDoesNotInvokeDerivedMakeCons)
+{
+    struct DerivedColor : B_Color
+    {
+        DerivedColor() : B_Color(10, 20, 30), calls(0) {}
+        void MakeCons() override { ++calls; }
+        unsigned int calls;
+    } source;
+    const B_Color product = source * 2.0F;
+    const B_Color quotient = source / 2.0F;
+    EXPECT_EQ(0u, source.calls);
+    EXPECT_EQ(20, product.r);
+    EXPECT_EQ(5, quotient.r);
+}
+
 TEST(ColorTests, DistanceToUsesUnsignedChannelsAndPreservesObjects)
 {
     B_Color first(0, 0x80, 0xFF), second(0xFF, 0x7F, 0);

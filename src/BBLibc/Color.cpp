@@ -3,6 +3,41 @@
 #include "IDataFile.h"
 #include "ODataFile.h"
 
+namespace
+{
+// The original x86 arithmetic keeps its intermediate on the x87 stack.
+// BICRT _ftol temporarily selects truncation, stores a signed 64-bit integer,
+// restores the control word, and the caller keeps only AL. In particular,
+// masked invalid conversions yield an integer-indefinite value with low byte 0.
+// A C++ float-to-byte cast loses these overflow and exception-flag semantics.
+byte ScaleColorChannel(int channel, float coefficient, bool divide)
+{
+    unsigned short savedControl, truncateControl;
+    __int64 converted;
+    __asm {
+        fild channel
+    }
+    if (divide)
+    {
+        __asm fdiv coefficient
+    }
+    else
+    {
+        __asm fmul coefficient
+    }
+    __asm {
+        fstcw savedControl
+        mov ax, savedControl
+        or ax, 0C00h
+        mov truncateControl, ax
+        fldcw truncateControl
+        fistp converted
+        fldcw savedControl
+    }
+    return static_cast<byte>(converted);
+}
+}
+
 
 /*
 *
@@ -69,12 +104,14 @@ void B_Color::SetColor(unsigned char red, unsigned char green, unsigned char blu
 * Entry point:            0x10006950
 * VC++ mangling:          ??DB_Color@@QBE?AV0@M@Z
 */
-#ifndef BLD_NATIVE
 B_Color B_Color::operator *(float coef) const
 {
-    return B_Color(static_cast<byte>(r * coef), static_cast<byte>(g * coef), static_cast<byte>(b * coef));
+    // Original evaluates B, G, R in that order, then constructs a base color.
+    const byte blue = ScaleColorChannel(b, coef, false);
+    const byte green = ScaleColorChannel(g, coef, false);
+    const byte red = ScaleColorChannel(r, coef, false);
+    return B_Color(red, green, blue);
 }
-#endif
 
 
 /*
@@ -82,12 +119,14 @@ B_Color B_Color::operator *(float coef) const
 * Entry point:            0x100069E0
 * VC++ mangling:          ??KB_Color@@QBE?AV0@M@Z
 */
-#ifndef BLD_NATIVE
 B_Color B_Color::operator /(float f)const
 {
-    return *this;
+    // No zero-divisor guard or saturation: retain the original x87 behavior.
+    const byte blue = ScaleColorChannel(b, f, true);
+    const byte green = ScaleColorChannel(g, f, true);
+    const byte red = ScaleColorChannel(r, f, true);
+    return B_Color(red, green, blue);
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
