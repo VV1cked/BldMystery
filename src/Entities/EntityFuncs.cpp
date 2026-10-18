@@ -1382,8 +1382,18 @@ int AddScheduledFunc(
 #ifndef BLD_NATIVE
 int RemoveScheduledFunc(const char *name)
 {
-    int (*bld_proc)(const char *name) = NULL;
-    return bld_proc(name);
+    for (unsigned int i = 0; i < B_world.scheduledFuncs.size; ++i)
+    {
+        if (B_world.scheduledFuncs[i]->name == name)
+        {
+            // The original removes the first matching record immediately,
+            // including its destructor, and compacts the array in place.
+            B_world.scheduledFuncs.Remove(i, true);
+            break;
+        }
+    }
+    // The export always returns 1, even when no name matched.
+    return 1;
 }
 #endif
 

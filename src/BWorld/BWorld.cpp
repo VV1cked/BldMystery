@@ -5,9 +5,12 @@
 #include <BWorld/BMap.h>
 #include <BWorld/light.h>
 #include "bld_misc_funcs.h"
+#include <BBLibc/BBLibc.h>
 #include <BBLibc/MessageManager.h>
 #include <BBLibc/Vararg.h>
+#include <math.h>
 
+extern "C" void WorldAdvanceToFrame(B_World *world, int frame);
 
 /*
 ................................................................................
@@ -56,6 +59,9 @@ double B_World::GetTime()
 #ifndef BLD_NATIVE
 int B_World::SetTime(double time)
 {
+    this->time = time;
+    // The original stores floor(time / frameDuration), including for negative times.
+    currentFrame = (int)floor(time / frameDuration);
     return true;
 }
 #endif
@@ -75,6 +81,10 @@ int B_World::SetTime(double time)
 #ifndef BLD_NATIVE
 void B_World::GoToTime(double time)
 {
+    int frame = (int)floor(time / frameDuration);
+    // Keep the verified frame-step engine intact: it updates clocks, slots,
+    // renderer state and scheduled callbacks, including its legacy stack quirk.
+    WorldAdvanceToFrame(this, frame);
 }
 #endif
 
@@ -101,6 +111,57 @@ void B_World::AddScheduledFunc(
     // Original appends without sorting or replacing equal names. The record
     // retains func and args; args is not validated here.
     scheduledFuncs.Append(new B_ScheduledFunc(name, time, func, args));
+}
+
+/*
+* Module:                 Blade.exe
+* Internal entry point:   0x0043BE95
+*/
+static int CallScheduledNativeCallback(B_ScheduledFunc *scheduled)
+{
+    int result;
+    // The original keeps the record in ECX, pushes its stored argument, then
+    // caller-cleans that stack slot after the indirect call.
+    __asm
+    {
+        mov eax, scheduled
+        mov ecx, eax
+        push dword ptr [eax + 020h]
+        call dword ptr [eax + 01Ch]
+        add esp, 4
+        mov result, eax
+    }
+    return result;
+}
+
+void B_World::ProcessScheduledFuncs(double time)
+{
+    unsigned int index = 0;
+    while (index < scheduledFuncs.size)
+    {
+        B_ScheduledFunc *scheduled = scheduledFuncs[index];
+        // The original x87 compare treats unordered (NaN) values as due.
+        // It also uses strict less-than, so an equal-time callback waits.
+        if (scheduled->time >= time)
+        {
+            ++index;
+            continue;
+        }
+
+        // The record leaves the array before the callback, but stays alive
+        // until afterwards. Callbacks may safely change the scheduled list.
+        scheduledFuncs.Remove(index, false);
+        if (scheduled->func)
+        {
+            PyObject *result = CallPythonObject(scheduled->func, scheduled->args);
+            Py_XDECREF(result);
+        }
+        else if (scheduled->unknown1C)
+        {
+            CallScheduledNativeCallback(scheduled);
+        }
+        delete scheduled;
+    }
 }
 
 /*

@@ -38,3 +38,10 @@ TEST(ScheduledFuncTests, Layout)
     EXPECT_OFFSET_EQ(B_ScheduledFunc, unknown1C, 0x1C);
     EXPECT_OFFSET_EQ(B_ScheduledFunc, unknown20, 0x20);
 }
+
+TEST(WorldSubscriptionTests, TimingLayout)
+{
+    EXPECT_EQ(sizeof(B_SubscriptionList), 0x34);
+    EXPECT_OFFSET_EQ(B_SubscriptionList, period, 0x24);
+    EXPECT_OFFSET_EQ(B_SubscriptionList, nextTime, 0x2C);
+}

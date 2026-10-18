@@ -63,10 +63,16 @@ public:
     virtual void unknown_method08C();
     virtual void unknown_method090();
     virtual void unknown_method094();
-    virtual void unknown_method098();
+    // B_World::GoToTime passes the computed frame time through this slot for
+    // every entity in the "Slot" subscription list. Hypothesis: this is a
+    // time-driven state update. Actor evaluates animation and pose; Spark
+    // advances its effect state. Aura, Camera, and PhysicSI use no-op stubs;
+    // other entity types remain unverified.
+    virtual void unknown_method098(double time);
     virtual void unknown_method09C();
     virtual void unknown_method0A0();
-    virtual void unknown_method0A4();
+    // l0043AC3D passes the scheduled subscription timestamp as a double.
+    virtual void unknown_method0A4(double time);
     virtual void unknown_method0A8();
     virtual void unknown_method0AC();
     virtual void unknown_method0B0();

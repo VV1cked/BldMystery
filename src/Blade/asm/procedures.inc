@@ -584,6 +584,8 @@ externdef ?GoToTime@B_World@@QAEXN@Z: near
 l0043AC07 equ ?GoToTime@B_World@@QAEXN@Z
 externdef ?AddScheduledFunc@B_World@@QAEXNPAUPyObject@@0PBD@Z: near
 l0043B8E6 equ ?AddScheduledFunc@B_World@@QAEXNPAUPyObject@@0PBD@Z
+externdef ?ProcessScheduledFuncs@B_World@@QAEXN@Z: near
+l0043BE95 equ ?ProcessScheduledFuncs@B_World@@QAEXN@Z
 externdef ?Update@B_World@@QAEXPAVB_ViewPose@@PAXNH@Z: near
 l0043C5FD equ ?Update@B_World@@QAEXPAVB_ViewPose@@PAXNH@Z
 externdef ?SetSun@B_World@@QAEXHABVB_Vector@@@Z: near

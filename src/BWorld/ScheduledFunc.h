@@ -16,6 +16,17 @@ public:
         Py_XINCREF(args);
     }
 
+    // Original native-callback constructor: Blade.exe 0x00439750.
+    B_ScheduledFunc(
+        const char *name, double time,
+        unsigned int callbackAddress, unsigned int callbackParam)
+        : B_NamedObj(B_Name(name)), time(time), func(NULL), args(NULL),
+          unknown1C(callbackAddress), unknown20(callbackParam)
+    {
+        // The scheduler calls callbackAddress with this record and
+        // callbackParam when func is NULL; the callback's return is ignored.
+    }
+
     // Original destructor: Blade.exe 0x004397C3.
     virtual ~B_ScheduledFunc()
     {

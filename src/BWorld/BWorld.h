@@ -22,6 +22,12 @@ class B_ViewPose;
 
 class B_SubscriptionList : public B_PtrArray<B_Entity>, public B_NamedObj
 {
+public:
+    // The native vtable slot +4 returns 0 for base lists, 1 for Timer and 2
+    // for Frame. l0043AC3D advances Timer nextTime by period; its "Pin" path
+    // removes matching entities from the world with delete=true.
+    double period;
+    double nextTime;
 };
 
 class B_TriggerSector : public B_NamedObj
@@ -70,6 +76,7 @@ public:
     void GoToTime(double time);
     void AddScheduledFunc(
         double time, PyObject *func, PyObject *args, const char *name);
+    void ProcessScheduledFuncs(double time);
     void Update(
         B_ViewPose *viewPose, void *cameraView, double time, int updateRaster);
     void SetSun(int exists, const B_Vector &position);
@@ -132,7 +139,9 @@ public:
     B_PtrArray<B_ScheduledFunc> scheduledFuncs;
     char unknownFields1858[4];
     B_Name world_file_name;
-    char unknownFields1864[24];
+    char unknownFields1864[12];
+    double frameDuration;
+    int currentFrame;
     int unknown187C;
     int unknown1880;
     double time;
