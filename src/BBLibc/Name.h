@@ -39,9 +39,6 @@ public:
     const B_Name &operator +=(char c);
     B_Name const &operator +=(B_Name const &other);
 
-    B_Name const &operator +(const char *str);
-
-
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x100022C0
@@ -79,6 +76,7 @@ public:
 
     void UpCase();
 private:
+    friend LIB_EXP B_IDataFile &operator >>(B_IDataFile &file, B_Name &name);
     char *string;
     unsigned int len;
 };

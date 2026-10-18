@@ -34,13 +34,7 @@ public:
     * Entry point:            0x10006BE0
     * VC++ mangling:          ??0B_Pal@@QAE@XZ
     */
-#ifndef BLD_NATIVE
-    B_Pal()
-    {
-    }
-#else
     B_Pal();
-#endif
 
     /*
     *

@@ -7,36 +7,33 @@
 * Entry point:            0x10032ABD
 * VC++ mangling:          ?ClassId@B_ObjDscr@@UBEGXZ
 */
-#ifndef BLD_NATIVE
 unsigned short B_ObjDscr::ClassId() const
 {
-    return 0;
+    // Original returns the fixed class identifier without reading object fields.
+    return 1;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10032ACC
 * VC++ mangling:          ?CheckSum@B_ObjDscr@@UBEKXZ
 */
-#ifndef BLD_NATIVE
 unsigned long B_ObjDscr::CheckSum() const
 {
+    // Original returns zero even for populated descriptors; it reads no fields.
     return 0;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10032AD9
 * VC++ mangling:          ?SerialSize@B_ObjDscr@@UBEIXZ
 */
-#ifndef BLD_NATIVE
 unsigned int B_ObjDscr::SerialSize() const
 {
+    // Original returns zero even for populated descriptors; it reads no fields.
     return 0;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll

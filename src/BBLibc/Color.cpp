@@ -1,6 +1,42 @@
 #define BBLIBC_LIB_EXPORT
 #include "Color.h"
+#include "IDataFile.h"
 #include "ODataFile.h"
+
+namespace
+{
+// The original x86 arithmetic keeps its intermediate on the x87 stack.
+// BICRT _ftol temporarily selects truncation, stores a signed 64-bit integer,
+// restores the control word, and the caller keeps only AL. In particular,
+// masked invalid conversions yield an integer-indefinite value with low byte 0.
+// A C++ float-to-byte cast loses these overflow and exception-flag semantics.
+byte ScaleColorChannel(int channel, float coefficient, bool divide)
+{
+    unsigned short savedControl, truncateControl;
+    __int64 converted;
+    __asm {
+        fild channel
+    }
+    if (divide)
+    {
+        __asm fdiv coefficient
+    }
+    else
+    {
+        __asm fmul coefficient
+    }
+    __asm {
+        fstcw savedControl
+        mov ax, savedControl
+        or ax, 0C00h
+        mov truncateControl, ax
+        fldcw truncateControl
+        fistp converted
+        fldcw savedControl
+    }
+    return static_cast<byte>(converted);
+}
+}
 
 
 /*
@@ -19,12 +55,48 @@
 * Entry point:            0x100068D0
 * VC++ mangling:          ??HB_Color@@QBE?AV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Color B_Color::operator +(B_Color const &color) const
 {
-    return *this;
+    // Original narrows each sum to a byte before MakeCons, so overflow wraps at 256.
+    // The result is a base B_Color; neither operand's virtual MakeCons is invoked.
+    return B_Color(static_cast<byte>(r + color.r),
+        static_cast<byte>(g + color.g), static_cast<byte>(b + color.b));
 }
-#endif
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10006A70
+* VC++ mangling:          ??8B_Color@@QAEIABV0@@Z
+*/
+unsigned int B_Color::operator ==(const B_Color &color)
+{
+    // Original compares RGB only, ignoring the vtable and padding, and returns 0 or 1.
+    return r == color.r && g == color.g && b == color.b;
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10006AD0
+* VC++ mangling:          ??9B_Color@@QAEIABV0@@Z
+*/
+unsigned int B_Color::operator !=(const B_Color &color)
+{
+    // Unlike B_Name's inequality, this original operator returns only 0 or 1.
+    return r != color.r || g != color.g || b != color.b;
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10006B30
+* VC++ mangling:          ?SetColor@B_Color@@QAEXEEE@Z
+*/
+void B_Color::SetColor(unsigned char red, unsigned char green, unsigned char blue)
+{
+    // Original writes r, b, then g, without invoking the virtual MakeCons hook.
+    r = red;
+    b = blue;
+    g = green;
+}
 
 
 /*
@@ -32,12 +104,14 @@ B_Color B_Color::operator +(B_Color const &color) const
 * Entry point:            0x10006950
 * VC++ mangling:          ??DB_Color@@QBE?AV0@M@Z
 */
-#ifndef BLD_NATIVE
 B_Color B_Color::operator *(float coef) const
 {
-    return B_Color(static_cast<byte>(r * coef), static_cast<byte>(g * coef), static_cast<byte>(b * coef));
+    // Original evaluates B, G, R in that order, then constructs a base color.
+    const byte blue = ScaleColorChannel(b, coef, false);
+    const byte green = ScaleColorChannel(g, coef, false);
+    const byte red = ScaleColorChannel(r, coef, false);
+    return B_Color(red, green, blue);
 }
-#endif
 
 
 /*
@@ -45,24 +119,29 @@ B_Color B_Color::operator *(float coef) const
 * Entry point:            0x100069E0
 * VC++ mangling:          ??KB_Color@@QBE?AV0@M@Z
 */
-#ifndef BLD_NATIVE
 B_Color B_Color::operator /(float f)const
 {
-    return *this;
+    // No zero-divisor guard or saturation: retain the original x87 behavior.
+    const byte blue = ScaleColorChannel(b, f, true);
+    const byte green = ScaleColorChannel(g, f, true);
+    const byte red = ScaleColorChannel(r, f, true);
+    return B_Color(red, green, blue);
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10009110
 * VC++ mangling:          ?DistanceTo@B_Color@@QAEMABV1@@Z
 */
-#ifndef BLD_NATIVE
 float B_Color::DistanceTo(const B_Color &arg_1)
 {
-    return 0.0F;
+    // Original returns the squared RGB distance as float, without a square root.
+    // Differences and their sum of squares are computed as signed integers first.
+    const int red = static_cast<int>(r) - arg_1.r;
+    const int green = static_cast<int>(g) - arg_1.g;
+    const int blue = static_cast<int>(b) - arg_1.b;
+    return static_cast<float>(red * red + green * green + blue * blue);
 }
-#endif
 
 
 /*
@@ -70,34 +149,31 @@ float B_Color::DistanceTo(const B_Color &arg_1)
 * Entry point:            0x100091A4
 * VC++ mangling:          ??5@YAAAVB_IDataFile@@AAV0@AAVB_Color@@@Z
 */
-#ifndef BLD_NATIVE
 B_IDataFile &operator >>(B_IDataFile &file, B_Color &color)
 {
-    return file;
+    // Original reads three separate RGB bytes, leaving the vtable and padding untouched.
+    // It performs no validation or MakeCons call, even after a short read.
+    return file >> color.r >> color.g >> color.b;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x100091DF
 * VC++ mangling:          ??6@YAAAVB_ODataFile@@AAV0@ABVB_Color@@@Z
 */
-#ifndef BLD_NATIVE
 B_ODataFile &operator <<(B_ODataFile &file, B_Color const &color)
 {
-    file.Write(&color, sizeof(B_Color));
-    return file;
+    // Original stores RGB only: no vtable, padding, length prefix, or normalization.
+    return file << color.r << color.g << color.b;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x1000921A
 * VC++ mangling:          ?MakeCons@B_Color@@UAEXXZ
 */
-#ifndef BLD_NATIVE
 void B_Color::MakeCons()
 {
-
+    // Original clamps zero-extended byte fields to [0, 255] and writes them back.
+    // Every stored byte is already in range: this cannot repair arithmetic overflow.
 }
-#endif

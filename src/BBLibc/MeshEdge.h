@@ -20,7 +20,12 @@ public:
 
     unsigned int field;
 private:
-
+    unsigned int firstIndex;
+    unsigned int secondIndex;
+    // Original stores six dwords; the remaining fields' meanings are not yet verified.
+    unsigned int field_0C;
+    unsigned int field_10;
+    unsigned int field_14;
 };
 
 #endif  // B_MESHEDGE_H

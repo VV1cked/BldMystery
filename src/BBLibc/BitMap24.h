@@ -4,6 +4,7 @@
 #define B_BITMAP24_H
 
 #include <bld_system.h>
+#include <new>
 
 #ifdef BBLIBC_LIB_EXPORT
 #define BUILD_LIB
@@ -12,37 +13,64 @@
 #undef BUILD_LIB
 
 template <typename T>
-class LIB_EXP B_Array {
+class B_Array {
 public:
-    B_Array() : data_(nullptr), size_(0), capacity_(0) {}
+    B_Array(unsigned int increment = 16)
+        : data_(nullptr), size_(0), increment_(increment), capacity_(0), deleteItems_(0) {}
+    virtual ~B_Array() { clear(); }
 
-    B_Array(size_t capacity) : data_(new T[capacity]), size_(0), capacity_(capacity) {}
-
-    virtual ~B_Array() { delete[] data_; }
-
-    // Add an element to the array
-    void push_back(const T &element) {
-        if (size_ == capacity_) {
-            // reallocate with double capacity
-            capacity_ *= 2;
-            T *newData = new T[capacity_];
-            std::copy(data_, data_ + size_, newData);
-            delete[] data_;
-            data_ = newData;
+    void push_back(T *element)
+    {
+        // Original stores pointers and increases capacity by a fixed increment.
+        if (capacity_ <= size_)
+        {
+            capacity_ += increment_;
+            T **replacement = static_cast<T **>(::operator new(capacity_ * sizeof(T *)));
+            for (unsigned int i = 0; i < size_; ++i) replacement[i] = data_[i];
+            if (size_) ::operator delete(data_);
+            data_ = replacement;
         }
         data_[size_++] = element;
     }
 
-    // Access an element at a given index
-    T &operator[](size_t index) { return data_[index]; }
+    void remove(T *element)
+    {
+        unsigned int index = 0;
+        while (index < size_ && data_[index] != element) ++index;
+        if (index == size_) return;
+        if (size_ == 1) { clear(); return; }
+        // Removal preserves order and may shrink by one increment before decrementing size.
+        if (capacity_ >= size_ + increment_ - 1u)
+        {
+            capacity_ -= increment_;
+            T **replacement = static_cast<T **>(::operator new(capacity_ * sizeof(T *)));
+            for (unsigned int i = 0; i < index; ++i) replacement[i] = data_[i];
+            for (unsigned int i = index + 1; i < size_; ++i) replacement[i - 1] = data_[i];
+            ::operator delete(data_);
+            data_ = replacement;
+        }
+        else
+            for (unsigned int i = index + 1; i < size_; ++i) data_[i - 1] = data_[i];
+        --size_;
+    }
 
-    // Get the current size of the array
-    size_t size() const { return size_; }
+    void clear()
+    {
+        // The bitmap registry is non-owning; clearing it never deletes registered objects.
+        if (!capacity_) return;
+        ::operator delete(data_);
+        data_ = nullptr;
+        size_ = capacity_ = 0;
+    }
+    T *operator[](unsigned int index) { return data_[index]; }
+    unsigned int size() const { return size_; }
 
 private:
-    T *data_; // pointer to the array data
-    size_t size_; // current size of the array
-    size_t capacity_; // maximum capacity of the array
+    T **data_;
+    unsigned int size_;
+    unsigned int increment_;
+    unsigned int capacity_;
+    unsigned int deleteItems_;
 };
 
 class B_BitMap;
@@ -77,40 +105,21 @@ public:
     * Entry point:            0x10006E20
     * VC++ mangling:          ?Clear@B_BitMap24@@QAEXXZ
     */
-#ifndef BLD_NATIVE
-    void Clear()
-    {
-    }
-#else
     void Clear();
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x10007090
     * VC++ mangling:          ?GetDimension@B_BitMap24@@QBEXAAH0@Z
     */
-#ifndef BLD_NATIVE
-    void GetDimension(int &arg_1, int &arg_2) const
-    {
-    }
-#else
     void GetDimension(int &arg_1, int &arg_2) const;
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x100070C0
     * VC++ mangling:          ?GetBits@B_BitMap24@@QBEPBEXZ
     */
-#ifndef BLD_NATIVE
-    const unsigned char *GetBits() const
-    {
-        return nullptr;
-    }
-#else
     const unsigned char *GetBits() const;
-#endif
 
     /*
     *

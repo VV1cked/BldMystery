@@ -20,7 +20,11 @@ public:
     B_RDataLight &operator=(const B_RDataLight&);
 
 private:
-
+    // Original Interp accesses four float slots; their higher-level meaning is unknown.
+    float unknown00;
+    float unknown04;
+    float unknown08;
+    float unknown0C;
 };
 
 
@@ -34,14 +38,14 @@ public:
     * Entry point:            0x10007F20
     * VC++ mangling:          ??4B_RItem@@QAEAAV0@ABV0@@Z
     */
-#ifndef BLD_NATIVE
     B_RItem &operator =(const B_RItem &that)
     {
+        // Original copies only the single base dword and returns this.
+        unknown00 = that.unknown00;
         return *this;
     }
-#else
-    B_RItem &operator =(const B_RItem &that);
-#endif
+private:
+    unsigned long unknown00;
 };
 
 #endif  // B_RDataLight_H

@@ -490,6 +490,8 @@
 				RelativePath=".\BBLibc\ColorTests.cpp"
 				>
 			</File>
+			<File RelativePath=".\BBLibc\RDataLightTests.cpp"></File>
+			<File RelativePath=".\BBLibc\RDataTriangleTests.cpp"></File>
 			<File
 				RelativePath=".\BBLibc\ElementCSVTests.cpp"
 				>
@@ -504,6 +506,10 @@
 			</File>
 			<File
 				RelativePath=".\BBLibc\ListTests.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BBLibc\MeshEdgeTests.cpp"
 				>
 			</File>
 			<File

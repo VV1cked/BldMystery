@@ -1,5 +1,6 @@
 #define BBLIBC_LIB_EXPORT
 #include "Name.h"
+#include "IDataFile.h"
 #include "ODataFile.h"
 
 
@@ -72,12 +73,11 @@ char * const B_Name::String() const
 * Entry point:            0x10003467
 * VC++ mangling:          ??OB_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator >(const B_Name &rhs) const
 {
-    return 0;
+    // Original ordering ignores stored lengths and compares unsigned bytes up to NUL.
+    return strcmp(this->string, rhs.string) > 0;
 }
-#endif
 
 
 /*
@@ -85,12 +85,11 @@ unsigned int B_Name::operator >(const B_Name &rhs) const
 * Entry point:            0x100034DA
 * VC++ mangling:          ??MB_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator <(const B_Name &rhs) const
 {
-    return 0;
+    // Original ordering ignores stored lengths and compares unsigned bytes up to NUL.
+    return strcmp(this->string, rhs.string) < 0;
 }
-#endif
 
 
 /*
@@ -98,12 +97,15 @@ unsigned int B_Name::operator <(const B_Name &rhs) const
 * Entry point:            0x1000354D
 * VC++ mangling:          ??8B_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator ==(const B_Name &rhs) const
 {
-    return 0;
+    // String() can change the text without updating len; the original checks len first.
+    if (this->len != rhs.len)
+    {
+        return 0;
+    }
+    return strcmp(this->string, rhs.string) == 0;
 }
-#endif
 
 
 /*
@@ -111,12 +113,11 @@ unsigned int B_Name::operator ==(const B_Name &rhs) const
 * Entry point:            0x100035D2
 * VC++ mangling:          ??8B_Name@@QBEIPBD@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator ==(const char *str) const
 {
-    return 0;
+    // This overload ignores stored length and stops at the first NUL.
+    return strcmp(this->string, str) == 0;
 }
-#endif
 
 
 /*
@@ -124,12 +125,17 @@ unsigned int B_Name::operator ==(const char *str) const
 * Entry point:            0x10003643
 * VC++ mangling:          ??9B_Name@@QBEIABV0@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator !=(const B_Name &rhs) const
 {
-    return !(*this == rhs);
+    // Different stored lengths always return 1, regardless of lexical order.
+    if (this->len != rhs.len)
+    {
+        return 1;
+    }
+    // The original returns the comparison sign, not a boolean: -1 becomes 0xFFFFFFFFu.
+    const int comparison = strcmp(this->string, rhs.string);
+    return static_cast<unsigned int>((comparison > 0) - (comparison < 0));
 }
-#endif
 
 
 /*
@@ -137,24 +143,27 @@ unsigned int B_Name::operator !=(const B_Name &rhs) const
 * Entry point:            0x100036C5
 * VC++ mangling:          ??9B_Name@@QBEIPBD@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::operator !=(const char *str) const
 {
-    return strcmp(string, str) != 0;
+    // Stored length is ignored; preserve the original 0, 1 or 0xFFFFFFFFu result.
+    const int comparison = strcmp(this->string, str);
+    return static_cast<unsigned int>((comparison > 0) - (comparison < 0));
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10003730
 * VC++ mangling:          ?CompareNoCase@B_Name@@QBEIABV1@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_Name::CompareNoCase(const B_Name &arg_1) const
 {
-    return 0;
+    // Compare stored lengths first, even if mutable buffers now contain equal text.
+    if (this->len != arg_1.len)
+    {
+        return 0;
+    }
+    return stricmp(this->string, arg_1.string) == 0;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
@@ -173,37 +182,40 @@ unsigned int B_Name::CompareNoCase(const char *str) const
 * Entry point:            0x1000378E
 * VC++ mangling:          ??4B_Name@@QAEAAV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Name &B_Name::operator =(const B_Name &src)
 {
+    // Original self-assignment copies the buffer onto itself; keep it unchanged.
     if (this != &src) {
-        //delete[] string;
-        //delete string;
-        len = src.len;
-        string = new char[len + 1];
+        // Equal stored lengths reuse the buffer, even if the text is now shorter.
+        if (len != src.len) {
+            delete[] string;
+            // On reallocation, the original uses strlen(src.string), not src.len.
+            len = static_cast<unsigned int>(strlen(src.string));
+            string = new char[len + 1];
+        }
         strcpy(string, src.string);
     }
     return *this;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10003821
 * VC++ mangling:          ?Right@B_Name@@QBE?AV1@I@Z
 */
-#ifndef BLD_NATIVE
 B_Name B_Name::Right(unsigned int count) const
 {
+    // Clamp unsigned count to stored length; UINT_MAX requests the full stored length.
     if (count > len) {
         count = len;
     }
 
     B_Name result(count);
+    // Use stored length for the suffix offset, so it may start after an earlier NUL.
+    // The result keeps count as its length even if strncpy encounters a NUL.
     strncpy(result.string, string + (len - count), count);
     return result;
 }
-#endif
 
 
 /*
@@ -211,43 +223,55 @@ B_Name B_Name::Right(unsigned int count) const
 * Entry point:            0x10003898
 * VC++ mangling:          ?Left@B_Name@@QBE?AV1@I@Z
 */
-#ifndef BLD_NATIVE
 B_Name B_Name::Left(unsigned int count) const
 {
+    // Clamp unsigned count to stored length; UINT_MAX requests the full stored length.
     if (count > len) {
         count = len;
     }
 
     B_Name result(count);
+    // Keep count as the result length even if strncpy stops at an earlier NUL.
     strncpy(result.string, string, count);
     return result;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10003904
 * VC++ mangling:          ??5@YAAAVB_IDataFile@@AAV0@AAVB_Name@@@Z
 */
-#ifndef BLD_NATIVE
 B_IDataFile &operator >>(B_IDataFile &file, B_Name &name)
 {
+    unsigned int length;
+    file >> length;
+    // Original reuses equal-length buffers and trusts the serialized length.
+    if (length != name.len) {
+        delete[] name.string;
+        name.len = length;
+        name.string = new char[length + 1];
+    }
+    // Read raw bytes, including embedded NULs, then append a terminator locally.
+    // A short read leaves the remaining buffer bytes unchanged or uninitialized.
+    file.Read(name.string, name.len);
+    name.string[name.len] = '\0';
     return file;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x1000398A
 * VC++ mangling:          ??6@YAAAVB_ODataFile@@AAV0@ABVB_Name@@@Z
 */
-#ifndef BLD_NATIVE
 B_ODataFile &operator <<(B_ODataFile &file, B_Name const &name)
 {
-    file.Write(&name, sizeof(B_Name));
+    const unsigned int length = name.Length();
+    // Original stores the 32-bit length and exactly len bytes, without a final NUL.
+    // Stored length controls serialization, including bytes after an earlier NUL.
+    file << length;
+    file.Write(name.String(), length);
     return file;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
@@ -266,12 +290,15 @@ B_Name::~B_Name() {
 * Entry point:            0x10003A70
 * VC++ mangling:          ??H@YA?AVB_Name@@ABV0@0@Z
 */
-#ifndef BLD_NATIVE
 B_Name operator +(B_Name const &lother, B_Name const &rother)
 {
-    return lother;
+    // Original stored length includes an extra byte, even for two empty names.
+    B_Name result(lother.Length() + rother.Length() + 1);
+    // Copy text up to NUL while retaining the length based on stored lengths.
+    strcpy(result.String(), lother.String());
+    strcat(result.String(), rother.String());
+    return result;
 }
-#endif
 
 
 /*
@@ -279,12 +306,14 @@ B_Name operator +(B_Name const &lother, B_Name const &rother)
 * Entry point:            0x10003B1E
 * VC++ mangling:          ??H@YA?AVB_Name@@ABV0@PBD@Z
 */
-#ifndef BLD_NATIVE
 B_Name operator +(B_Name const &other, const char *str)
 {
-    return other;
+    // Preserve the original extra byte and the name's possibly stale stored length.
+    B_Name result(other.Length() + static_cast<unsigned int>(strlen(str)) + 1);
+    strcpy(result.String(), other.String());
+    strcat(result.String(), str);
+    return result;
 }
-#endif
 
 
 /*
@@ -292,12 +321,14 @@ B_Name operator +(B_Name const &other, const char *str)
 * Entry point:            0x10003BC7
 * VC++ mangling:          ??H@YA?AVB_Name@@PBDABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Name operator +(const char *str, const B_Name &bName)
 {
-    return str;
+    // Preserve the original extra byte and the name's possibly stale stored length.
+    B_Name result(static_cast<unsigned int>(strlen(str)) + bName.Length() + 1);
+    strcpy(result.String(), str);
+    strcat(result.String(), bName.String());
+    return result;
 }
-#endif
 
 
 /*
@@ -305,12 +336,18 @@ B_Name operator +(const char *str, const B_Name &bName)
 * Entry point:            0x10003C70
 * VC++ mangling:          ??YB_Name@@QAEABV0@PBD@Z
 */
-#ifndef BLD_NATIVE
 B_Name const &B_Name::operator +=(const char *str)
 {
+    // Original always reallocates, even for empty text, and retains stale length.
+    len += static_cast<unsigned int>(strlen(str));
+    char *result = new char[len + 1];
+    strcpy(result, string);
+    // Keep the old buffer alive until copying finishes: str may point into it.
+    strcat(result, str);
+    delete[] string;
+    string = result;
     return *this;
 }
-#endif
 
 
 /*
@@ -318,12 +355,20 @@ B_Name const &B_Name::operator +=(const char *str)
 * Entry point:            0x10003D30
 * VC++ mangling:          ??YB_Name@@QAEABV0@D@Z
 */
-#ifndef BLD_NATIVE
 const B_Name &B_Name::operator+=(char c)
 {
+    // Even a NUL character increases stored length and forces reallocation.
+    ++len;
+    char *result = new char[len + 1];
+    strcpy(result, string);
+    // Use the stored end, not strlen: an earlier NUL can hide the appended byte.
+    // Padding between that NUL and the appended byte remains uninitialized.
+    result[len - 1] = c;
+    result[len] = '\0';
+    delete[] string;
+    string = result;
     return *this;
 }
-#endif
 
 
 /*
@@ -331,12 +376,18 @@ const B_Name &B_Name::operator+=(char c)
 * Entry point:            0x10003DCE
 * VC++ mangling:          ??YB_Name@@QAEABV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_Name const &B_Name::operator +=(const B_Name &other)
 {
+    // Add stored lengths without the extra byte used by the free operator +.
+    len += other.len;
+    char *result = new char[len + 1];
+    strcpy(result, string);
+    // Delay replacing the buffer so self-append copies the original text twice.
+    strcat(result, other.string);
+    delete[] string;
+    string = result;
     return *this;
 }
-#endif
 
 
 /*

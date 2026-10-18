@@ -95,42 +95,21 @@ public:
     * Entry point:            0x10003100
     * VC++ mangling:          ?nElements@B_List@@QAEIXZ
     */
-#ifndef BLD_NATIVE
-    unsigned int nElements()
-    {
-        return 0;
-    }
-#else
     unsigned int nElements();
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x10003120
     * VC++ mangling:          ?GetFirst@B_List@@QAEPAVB_ListElement@@XZ
     */
-#ifndef BLD_NATIVE
-    B_ListElement *GetFirst()
-    {
-        return nullptr;
-    }
-#else
     B_ListElement *GetFirst();
-#endif
 
     /*
     * Module:                 BBLibc.dll
     * Entry point:            0x10003140
     * VC++ mangling:          ?GetLast@B_List@@QAEPAVB_ListElement@@XZ
     */
-#ifndef BLD_NATIVE
-    B_ListElement *GetLast()
-    {
-        return nullptr;
-    }
-#else
     B_ListElement *GetLast();
-#endif
 
     /*
     * Module:                 BBLibc.dll
@@ -158,13 +137,13 @@ public:
     */
 #ifndef BLD_NATIVE
 #endif
-    void DeleteList(unsigned int arg_1);
+    void DeleteList(unsigned int deleteElements);
     unsigned int Add(B_ListElement *element);
-    unsigned int AddAfter(B_ListElement *existing, B_ListElement *newElement);
-    unsigned int AddBefore(B_ListElement *existing, B_ListElement *newElement);
-    unsigned int Remove(B_ListElement *element, unsigned int index);
-    B_ListElement *RemoveFirst(unsigned int arg_1);
-    B_ListElement *RemoveLast(unsigned int arg_1);
+    unsigned int AddAfter(B_ListElement *newElement, B_ListElement *existing);
+    unsigned int AddBefore(B_ListElement *newElement, B_ListElement *existing);
+    unsigned int Remove(B_ListElement *element, unsigned int deleteElement);
+    B_ListElement *RemoveFirst(unsigned int deleteElement);
+    B_ListElement *RemoveLast(unsigned int deleteElement);
     B_ListElement *GetAt(unsigned int arg_1);
     unsigned int Exists(const B_ListElement *element);
 

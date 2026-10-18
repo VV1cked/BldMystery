@@ -1,6 +1,7 @@
 #define BBLIBC_LIB_EXPORT
 #include <bld_system.h>
 #include "List.h"
+#include "MessageManager.h"
 
 
 /*
@@ -43,23 +44,42 @@ B_ListElement::~B_ListElement()
 * Entry point:            0x100029AE
 * VC++ mangling:          ?DeleteList@B_List@@QAEXI@Z
 */
-#ifndef BLD_NATIVE
-void B_List::DeleteList(unsigned int arg_1)
+void B_List::DeleteList(unsigned int deleteElements)
 {
+    // Original's non-deleting mode forgets the chain without clearing node owners or links.
+    if (deleteElements != 0)
+        while (numElements != 0)
+            RemoveFirst(1);
+    numElements = 0;
+    head = nullptr;
+    tail = nullptr;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002A14
 * VC++ mangling:          ?Add@B_List@@QAEIPAVB_ListElement@@@Z
 */
-#ifndef BLD_NATIVE
 unsigned int B_List::Add(B_ListElement *element)
 {
-    return 0;
+    // Original prepends without checking ownership. Empty-list insertion leaves node links untouched.
+    if (tail != nullptr)
+    {
+        tail->prev = element;
+        element->next = tail;
+        element->prev = nullptr;
+        tail = element;
+    }
+    else
+    {
+        tail = element;
+        head = element;
+    }
+    // Preserve the original 32-bit wrapping increment, including a stale signed count.
+    numElements = static_cast<int>(static_cast<unsigned int>(numElements) + 1u);
+    element->list = this;
+    return 1;
 }
-#endif
 
 
 /*
@@ -67,12 +87,30 @@ unsigned int B_List::Add(B_ListElement *element)
 * Entry point:            0x10002A86
 * VC++ mangling:          ?AddAfter@B_List@@QAEIPAVB_ListElement@@0@Z
 */
-#ifndef BLD_NATIVE
-unsigned int B_List::AddAfter(B_ListElement *existing, B_ListElement *newElement)
+unsigned int B_List::AddAfter(B_ListElement *newElement, B_ListElement *existing)
 {
-    return 0;
+    // Original takes the new node first. A duplicate owner logs an error but does not stop insertion.
+    if (newElement->list == this)
+        mout << "Error -> Adding element twice.\n";
+    if (existing == head)
+    {
+        head->next = newElement;
+        newElement->prev = head;
+        newElement->next = nullptr;
+        head = newElement;
+    }
+    else
+    {
+        B_ListElement *next = existing->next;
+        next->prev = newElement;
+        newElement->next = next;
+        newElement->prev = existing;
+        existing->next = newElement;
+    }
+    numElements = static_cast<int>(static_cast<unsigned int>(numElements) + 1u);
+    newElement->list = this;
+    return 1;
 }
-#endif
 
 
 /*
@@ -80,12 +118,28 @@ unsigned int B_List::AddAfter(B_ListElement *existing, B_ListElement *newElement
 * Entry point:            0x10002B34
 * VC++ mangling:          ?AddBefore@B_List@@QAEIPAVB_ListElement@@0@Z
 */
-#ifndef BLD_NATIVE
-unsigned int B_List::AddBefore(B_ListElement *existing, B_ListElement *newElement)
+unsigned int B_List::AddBefore(B_ListElement *newElement, B_ListElement *existing)
 {
-    return 0;
+    // Original takes the new node first and performs no ownership or duplicate check.
+    if (existing == tail)
+    {
+        tail->prev = newElement;
+        newElement->next = tail;
+        newElement->prev = nullptr;
+        tail = newElement;
+    }
+    else
+    {
+        B_ListElement *prev = existing->prev;
+        prev->next = newElement;
+        newElement->prev = prev;
+        newElement->next = existing;
+        existing->prev = newElement;
+    }
+    numElements = static_cast<int>(static_cast<unsigned int>(numElements) + 1u);
+    newElement->list = this;
+    return 1;
 }
-#endif
 
 
 /*
@@ -93,48 +147,103 @@ unsigned int B_List::AddBefore(B_ListElement *existing, B_ListElement *newElemen
 * Entry point:            0x10002BC5
 * VC++ mangling:          ?Remove@B_List@@QAEIPAVB_ListElement@@I@Z
 */
-#ifndef BLD_NATIVE
-unsigned int B_List::Remove(B_ListElement *element, unsigned int index)
+unsigned int B_List::Remove(B_ListElement *element, unsigned int deleteElement)
 {
-    return 0;
+    // Original checks only count and endpoint identity; it does not validate membership.
+    if (numElements == 0)
+        return 0;
+    if (element == tail)
+    {
+        RemoveFirst(deleteElement);
+        return 1;
+    }
+    if (element == head)
+    {
+        RemoveLast(deleteElement);
+        return 1;
+    }
+    B_ListElement *prev = element->prev;
+    B_ListElement *next = element->next;
+    element->prev = nullptr;
+    element->next = nullptr;
+    prev->next = next;
+    next->prev = prev;
+    element->list = nullptr;
+    // Any nonzero flag deletes. Unlike endpoint removal, the count changes AFTER destruction.
+    if (deleteElement != 0)
+        delete element;
+    numElements = static_cast<int>(static_cast<unsigned int>(numElements) - 1u);
+    return 1;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002CAC
 * VC++ mangling:          ?RemoveFirst@B_List@@QAEPAVB_ListElement@@I@Z
 */
-#ifndef BLD_NATIVE
-B_ListElement *B_List::RemoveFirst(unsigned int arg_1)
+B_ListElement *B_List::RemoveFirst(unsigned int deleteElement)
 {
-    return nullptr;
+    if (numElements == 0)
+        return nullptr;
+    numElements = static_cast<int>(static_cast<unsigned int>(numElements) - 1u);
+    B_ListElement *element = tail;
+    tail = tail->next;
+    if (numElements != 0)
+        tail->prev = nullptr;
+    // Original leaves head untouched when the last node is removed, even if it becomes dangling.
+    element->list = nullptr;
+    element->next = nullptr;
+    element->prev = nullptr;
+    if (deleteElement != 0)
+    {
+        delete element;
+        return nullptr;
+    }
+    return element;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002D5D
 * VC++ mangling:          ?RemoveLast@B_List@@QAEPAVB_ListElement@@I@Z
 */
-#ifndef BLD_NATIVE
-B_ListElement *B_List::RemoveLast(unsigned int arg_1)
+B_ListElement *B_List::RemoveLast(unsigned int deleteElement)
 {
-    return nullptr;
+    if (numElements == 0)
+        return nullptr;
+    numElements = static_cast<int>(static_cast<unsigned int>(numElements) - 1u);
+    B_ListElement *element = head;
+    head = head->prev;
+    if (numElements != 0)
+        head->next = nullptr;
+    // Original leaves tail untouched when the last node is removed, even if it becomes dangling.
+    element->list = nullptr;
+    element->next = nullptr;
+    element->prev = nullptr;
+    if (deleteElement != 0)
+    {
+        delete element;
+        return nullptr;
+    }
+    return element;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002E0E
 * VC++ mangling:          ?GetAt@B_List@@QAEPAVB_ListElement@@I@Z
 */
-#ifndef BLD_NATIVE
 B_ListElement *B_List::GetAt(unsigned int arg_1)
 {
-    return nullptr;
+    // Original uses an unsigned count comparison and permits index == count.
+    // It follows next from offset 0x8 (named tail here), without checking intermediate links.
+    if (static_cast<unsigned int>(numElements) < arg_1)
+        return nullptr;
+    B_ListElement *element = tail;
+    for (unsigned int index = 0; index < arg_1; ++index)
+        element = element->next;
+    return element;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
@@ -142,36 +251,38 @@ B_ListElement *B_List::GetAt(unsigned int arg_1)
 * VC++ mangling:          ?Exists@B_List@@QAEIPBVB_ListElement@@@Z
 */
 
-#ifndef BLD_NATIVE
 unsigned int B_List::Exists(const B_ListElement *element)
 {
-    return false;
+    // Original scans links rather than checking the stored count or element's owner.
+    for (B_ListElement *current = tail; current != nullptr; current = current->next)
+        if (current == element)
+            return 1;
+    return 0;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002EE0
 * VC++ mangling:          ?GetList@B_ListElement@@QAEPAVB_List@@XZ
 */
-#ifndef BLD_NATIVE
 B_List *B_ListElement::GetList()
 {
-    return nullptr;
+    return list;
 }
-#endif
 
 /*
 * Module:                 BBLibc.dll
 * Entry point:            0x10002F80
 * VC++ mangling:          ??4B_ListElement@@QAEAAV0@ABV0@@Z
 */
-#ifndef BLD_NATIVE
 B_ListElement &B_ListElement::operator =(const B_ListElement &other)
 {
+    // Original shallow-copies all three links without detaching or relinking either node.
+    list = other.list;
+    next = other.next;
+    prev = other.prev;
     return *this;
 }
-#endif
 
 
 // B_List implementation
@@ -181,12 +292,42 @@ B_ListElement &B_ListElement::operator =(const B_ListElement &other)
 * Entry point:            0x100030A0
 * VC++ mangling:          ??0B_List@@QAE@PAVB_ListElement@@@Z
 */
-#ifndef BLD_NATIVE
-B_List::B_List(B_ListElement *element)
+B_List::B_List(B_ListElement *element) : numElements(0), tail(nullptr), head(nullptr)
 {
-
+    // Original ignores element entirely and always constructs an empty list.
 }
-#endif
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10003100
+* VC++ mangling:          ?nElements@B_List@@QAEIXZ
+*/
+unsigned int B_List::nElements()
+{
+    // Original returns the stored 32-bit count unchanged, even if its signed value is negative.
+    return static_cast<unsigned int>(numElements);
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10003120
+* VC++ mangling:          ?GetFirst@B_List@@QAEPAVB_ListElement@@XZ
+*/
+B_ListElement *B_List::GetFirst()
+{
+    // Despite the field name, original GetFirst reads tail at offset 0x8.
+    return tail;
+}
+
+/*
+* Module:                 BBLibc.dll
+* Entry point:            0x10003140
+* VC++ mangling:          ?GetLast@B_List@@QAEPAVB_ListElement@@XZ
+*/
+B_ListElement *B_List::GetLast()
+{
+    return head;
+}
 
 
 /*
@@ -194,9 +335,8 @@ B_List::B_List(B_ListElement *element)
 * Entry point:            0x10003160
 * VC++ mangling:          ??0B_List@@QAE@ABV0@@Z
 */
-#ifndef BLD_NATIVE
-B_List::B_List(B_List const&)
+B_List::B_List(B_List const &other)
+    : numElements(other.numElements), tail(other.tail), head(other.head)
 {
-
+    // Original shallow-copies the list view; node links and their owner pointers are unchanged.
 }
-#endif
