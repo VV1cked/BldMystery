@@ -6,6 +6,8 @@
 
 TEST(WorldTests, Fields)
 {
+    EXPECT_OFFSET_EQ(B_World, time, 0x1884);
+    EXPECT_OFFSET_EQ(B_World, scheduledFuncs, 0x1840);
     EXPECT_OFFSET_EQ(B_World, entities, 0x0018);
     EXPECT_OFFSET_EQ(B_World, entities.size, 0x0018);
     EXPECT_OFFSET_EQ(B_World, entities.hash, 0x001C);
@@ -25,4 +27,14 @@ TEST(WorldTests, Fields)
     EXPECT_OFFSET_EQ(B_World, lights, 0x1920);
     EXPECT_OFFSET_EQ(B_World, initial_point_position, 0x1954);
     EXPECT_OFFSET_EQ(B_World, initial_point_orientation, 0x196C);
+}
+
+TEST(ScheduledFuncTests, Layout)
+{
+    EXPECT_EQ(sizeof(B_ScheduledFunc), 0x24);
+    EXPECT_OFFSET_EQ(B_ScheduledFunc, time, 0x0C);
+    EXPECT_OFFSET_EQ(B_ScheduledFunc, func, 0x14);
+    EXPECT_OFFSET_EQ(B_ScheduledFunc, args, 0x18);
+    EXPECT_OFFSET_EQ(B_ScheduledFunc, unknown1C, 0x1C);
+    EXPECT_OFFSET_EQ(B_ScheduledFunc, unknown20, 0x20);
 }

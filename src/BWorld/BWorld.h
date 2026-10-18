@@ -15,6 +15,7 @@
 #include <Hash.h>
 #include <AnalyticGeometry/Vector.h>
 #include <bld_python.h>
+#include <BWorld/ScheduledFunc.h>
 
 
 class B_ViewPose;
@@ -128,12 +129,14 @@ public:
     B_Hash<B_Entity> entities;
     int nextEntitySuffix;
     B_PtrArray<B_SubscriptionList> subscriptions;
-    char unknownFields1840[28];
+    B_PtrArray<B_ScheduledFunc> scheduledFuncs;
+    char unknownFields1858[4];
     B_Name world_file_name;
     char unknownFields1864[24];
     int unknown187C;
     int unknown1880;
-    char unknownFields1884[40];
+    double time;
+    char unknownFields188C[32];
     B_PtrArray<atmosphere_t> atmospheres;
     B_Map map;
     B_OctTree octTree;

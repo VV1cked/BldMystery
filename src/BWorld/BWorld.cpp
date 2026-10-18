@@ -5,6 +5,8 @@
 #include <BWorld/BMap.h>
 #include <BWorld/light.h>
 #include "bld_misc_funcs.h"
+#include <BBLibc/MessageManager.h>
+#include <BBLibc/Vararg.h>
 
 
 /*
@@ -40,12 +42,11 @@ void B_World::unknown_00439F5D()
 * Entry point:            0x0043A6A4
 * VC++ mangling:          ?GetTime@B_World@@QAENXZ
 */
-#ifndef BLD_NATIVE
 double B_World::GetTime()
 {
-    return 0.0;
+    // Original reads the stored double at 0x1884 directly; no clock query or scaling.
+    return time;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
@@ -89,12 +90,18 @@ void B_World::GoToTime(double time)
 * Entry point:            0x0043B8E6
 * VC++ mangling:          ?AddScheduledFunc@B_World@@QAEXNPAUPyObject@@0PBD@Z
 */
-#ifndef BLD_NATIVE
 void B_World::AddScheduledFunc(
     double time, PyObject *func, PyObject *args, const char *name)
 {
+    if (!PyCallable_Check(func))
+    {
+        mout << vararg("Warning: AddScheduledFunc() called for %s with uncallable function.\n", name);
+        return;
+    }
+    // Original appends without sorting or replacing equal names. The record
+    // retains func and args; args is not validated here.
+    scheduledFuncs.Append(new B_ScheduledFunc(name, time, func, args));
 }
-#endif
 
 /*
 ................................................................................
