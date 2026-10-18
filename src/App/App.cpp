@@ -31,16 +31,48 @@
 ................................................................................
 */
 
+// Original constructor: 0x004111B0. param is scratch storage populated by Call;
+// the original constructor deliberately leaves it uninitialized.
+B_AfterFrameFunc::B_AfterFrameFunc(const char *name, PyObject *function)
+    : B_NamedObj(B_Name(name))
+{
+    Py_XINCREF(function);
+    func = function;
+    removed = false;
+}
+
+// Original destructor: 0x00411216. param is not an owned reference here.
+B_AfterFrameFunc::~B_AfterFrameFunc()
+{
+    Py_XDECREF(func);
+}
+
+// Original replacement helper: 0x0041133F.
+void B_AfterFrameFunc::SetFunc(PyObject *function)
+{
+    // Preserve original DECREF-before-INCREF order, including self-replacement.
+    Py_XDECREF(func);
+    Py_XINCREF(function);
+    func = function;
+}
+
 /*
 * Module:                 Blade.exe
 * Entry point:            0x00411281
 * VC++ mangling:          ?Call@B_AfterFrameFunc@@QAEXM@Z
 */
-#ifndef BLD_NATIVE
 void B_AfterFrameFunc::Call(float time)
 {
+    PyObject *timeObject = PyFloat_FromDouble(time);
+    param = PyTuple_New(1);
+    PyTuple_SET_ITEM(param, 0, timeObject);
+    PyObject *result = CallPythonObject(func, param);
+    // Original releases the tuple through the member after the callback, and
+    // leaves param unchanged (potentially dangling). Preserve this also for
+    // reentrant calls; the destructor must not DECREF param again.
+    Py_DECREF(param);
+    Py_XDECREF(result);
 }
-#endif
 
 /*
 ................................................................................
@@ -1459,11 +1491,25 @@ int B_App::CDSetCallBack(PyObject *func)
 * Entry point:            0x00416309
 * VC++ mangling:          ?SetAfterFrameFunc@B_App@@QAEXPBDPAUPyObject@@@Z
 */
-#ifndef BLD_NATIVE
 void B_App::SetAfterFrameFunc(const char *name, PyObject *function)
 {
+    if (!PyCallable_Check(function))
+    {
+        mout << vararg("B_App::SetAfterFrameFunc() -> Warning: trying to set non-callable SetAfterFrameFunc (%s).\n", name);
+        return;
+    }
+
+    B_AfterFrameFunc *frameFunc = afterFrameFuncs.Find(B_Name(name));
+    if (frameFunc)
+    {
+        // Original replaces in place, retaining both order and the removed flag.
+        frameFunc->SetFunc(function);
+        return;
+    }
+    frameFunc = new B_AfterFrameFunc(name, function);
+    assert(frameFunc);
+    afterFrameFuncs.Append(frameFunc);
 }
-#endif
 
 
 /*
@@ -1471,24 +1517,25 @@ void B_App::SetAfterFrameFunc(const char *name, PyObject *function)
 * Entry point:            0x0041653E
 * VC++ mangling:          ?GetAfterFrameFunc@B_App@@QAEPAUPyObject@@PBD@Z
 */
-#ifndef BLD_NATIVE
 PyObject *B_App::GetAfterFrameFunc(const char *name)
 {
-    return NULL;
+    B_AfterFrameFunc *frameFunc = afterFrameFuncs.Find(B_Name(name));
+    // Original returns a borrowed reference, even for an entry marked removed.
+    return frameFunc ? frameFunc->func : NULL;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
 * Entry point:            0x004165D8
 * VC++ mangling:          ?GetAfterFrameFuncName@B_App@@QAEPBDH@Z
 */
-#ifndef BLD_NATIVE
 const char *B_App::GetAfterFrameFuncName(int index)
 {
-    return NULL;
+    if (index < 0 || static_cast<unsigned int>(index) >= afterFrameFuncs.size)
+        return NULL;
+    // Original exposes the stored name until physical removal by the frame loop.
+    return afterFrameFuncs[index]->name.String();
 }
-#endif
 
 /*
 * Module:                 Blade.exe
@@ -1530,12 +1577,18 @@ PyObject *B_App::GetMenuTgapFunc()
 * Entry point:            0x0041668C
 * VC++ mangling:          ?RemoveAfterFrameFunc@B_App@@QAEHPBD@Z
 */
-#ifndef BLD_NATIVE
 int B_App::RemoveAfterFrameFunc(const char *name)
 {
+    B_AfterFrameFunc *frameFunc = afterFrameFuncs.Find(B_Name(name));
+    if (frameFunc)
+    {
+        // Original defers destruction (and DECREF) to the frame loop. Repeated
+        // removal still returns 1 until that loop physically removes the entry.
+        frameFunc->removed = true;
+        return 1;
+    }
     return 0;
 }
-#endif
 
 /*
 ................................................................................

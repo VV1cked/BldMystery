@@ -28,6 +28,9 @@ class B_Widget;
 class B_AfterFrameFunc : public B_NamedObj
 {
 public:
+    B_AfterFrameFunc(const char *name, PyObject *function);
+    virtual ~B_AfterFrameFunc();
+    void SetFunc(PyObject *function);
     void Call(float time);
 
     PyObject *func;
