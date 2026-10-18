@@ -798,17 +798,24 @@ void SetCombatGroup()
 * Module:                 Blade.exe
 * Entry point:            0x00508B11
 */
-#ifndef BLD_NATIVE
 int SubscribeEntityToList(
         const char *entity_name, const char *timer_name
 )
 {
-    int (*bld_proc)(
-        const char *entity_name, const char *timer_name
-) = NULL;
-    return bld_proc(entity_name, timer_name);
+    B_Entity *entity = GetEntity(entity_name);
+    // The original constructs/destroys the name even when lookup fails.
+    B_Name listName(timer_name);
+    if (!entity)
+        return 0;
+
+    // The native slot returns a byte: ignore the upper bits of EAX and
+    // normalize any nonzero low byte to 1. Duplicate/absent membership is 0.
+    typedef unsigned char (__thiscall *Membership)(B_Entity *, const B_Name &);
+    void **table = *reinterpret_cast<void ***>(entity);
+    unsigned char result = reinterpret_cast<Membership>(table[0x08C / 4])(
+        entity, listName);
+    return result ? 1 : 0;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
@@ -1010,17 +1017,24 @@ double SQDistance2(const char *entity_name1, const char *entity_name2)
 * Module:                 Blade.exe
 * Entry point:            0x0050973E
 */
-#ifndef BLD_NATIVE
 int RemoveEntityFromList(
         const char *entity_name, const char *timer_name
 )
 {
-    int (*bld_proc)(
-        const char *entity_name, const char *timer_name
-) = NULL;
-    return bld_proc(entity_name, timer_name);
+    B_Entity *entity = GetEntity(entity_name);
+    // The original constructs/destroys the name even when lookup fails.
+    B_Name listName(timer_name);
+    if (!entity)
+        return 0;
+
+    // The native slot returns a byte: ignore the upper bits of EAX and
+    // normalize any nonzero low byte to 1. Duplicate/absent membership is 0.
+    typedef unsigned char (__thiscall *Membership)(B_Entity *, const B_Name &);
+    void **table = *reinterpret_cast<void ***>(entity);
+    unsigned char result = reinterpret_cast<Membership>(table[0x090 / 4])(
+        entity, listName);
+    return result ? 1 : 0;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
