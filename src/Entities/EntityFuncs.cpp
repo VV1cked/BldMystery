@@ -1391,31 +1391,41 @@ int RemoveScheduledFunc(const char *name)
 * Module:                 Blade.exe
 * Entry point:            0x00517758
 */
-#ifndef BLD_NATIVE
 int GetnScheduledFuncs()
 {
-    int (*bld_proc)() = NULL;
-    return bld_proc();
+    return B_world.scheduledFuncs.size;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
 * Entry point:            0x00517767
 */
-#ifndef BLD_NATIVE
 int GetScheduledFunc(
         int index, PyObject **func, PyObject **args, const char **name,
         double *time
 )
 {
-    int (*bld_proc)(
-        int index, PyObject **func, PyObject **args, const char **name,
-        double *time
-) = NULL;
-    return bld_proc(index, func, args, name, time);
+    if (index >= 0 && static_cast<unsigned int>(index) < B_world.scheduledFuncs.size)
+    {
+        B_ScheduledFunc *scheduled = B_world.scheduledFuncs[index];
+        *func = scheduled->func;
+        *args = scheduled->args;
+        *name = scheduled->name.String();
+        if (*func && *args && *name)
+        {
+            *time = scheduled->time;
+            // Original gives the caller owned Python references, but borrows name.
+            Py_XINCREF(*func);
+            Py_XINCREF(*args);
+            return 1;
+        }
+    }
+    // Original leaves *time untouched on failure, including non-Python records.
+    *func = NULL;
+    *args = NULL;
+    *name = NULL;
+    return 0;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
