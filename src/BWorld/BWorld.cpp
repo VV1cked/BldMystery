@@ -188,6 +188,13 @@ void B_World::ProcessScheduledFuncs(double time)
 // Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005), native paths only;
 // no validation of the empty C++ body. Unknown: inner map emission.
 // Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
+// Description: map +0x31B8B first calls +0x4A1AC at +0x31C71 on the
+// observed this+0x28==0 path; its global-list dispatch precedes list reset.
+// Origin: ASM_RETAINED for this map path; Update C++ remains a stub.
+// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE, 24 original call/return pairs;
+// C++ equivalence not established. Unknown: callback command emission.
+// Evidence: CODEX-006 / OBS-0060 /
+// CODEX_006_MAP_FACADE_RENDER_EDGE_RESULTS_2026-10-20.md
 #ifndef BLD_NATIVE
 void B_World::Update(
     B_ViewPose *viewPose, void *cameraView, double time, int updateRaster)

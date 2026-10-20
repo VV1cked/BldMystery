@@ -189,8 +189,15 @@ public:
     // Origin: INTERFACE_ONLY (no-argument signature is a legacy declaration).
     // Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005): original caller
     // passes three pointer arguments, unlike this declaration.
-    // Unknown: exact signature/stack cleanup; do not change ABI yet.
+    // CODEX-006: original thunk+0x126C/body+0x30E68 reads three slots;
+    // Validation: ORIGINAL_BEHAVIOR_IN_SCOPE, 24 World call/return pairs,
+    // ret 0xC; another caller at Blade.exe+0x317FB was also observed.
+    // C++ equivalence not established. Origin remains INTERFACE_ONLY.
+    // Unknown: exact pointee types, ownership and full caller coverage.
+    // Keep the legacy declaration pending complete ABI validation.
     // Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
+    // Evidence: CODEX-006 / OBS-0062 /
+    // CODEX_006_MAP_FACADE_RENDER_EDGE_RESULTS_2026-10-20.md
     virtual void unknown0F0() = 0;
     virtual void unknown0F4() = 0;
     virtual void unknown0F8() = 0;
