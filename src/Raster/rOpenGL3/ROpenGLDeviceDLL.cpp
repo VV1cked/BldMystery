@@ -241,6 +241,11 @@ int B_OpenGLRasterDevice::CreateContext()
 * VC++ mangling:          ?SwapBuffers@B_OpenGLRasterDevice@@UAEXXZ
 */
 
+// Description: original rOpenGL.dll+0x1FDF8 is virtual SwapBuffers;
+// Raster.dll Python/C wrapper used it during observed bootstrap.
+// Origin: LEGACY_CPP. Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005),
+// separate from EndScene; reconstructed C++ fidelity not established.
+// Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
 void B_OpenGLRasterDevice::SwapBuffers()
 {
     if (!::SwapBuffers(this->deviceContext))
@@ -484,6 +489,12 @@ void B_OpenGLRasterDevice::StartScene(B_ViewPose *cameraPose)
 * VC++ mangling:          ?EndScene@B_OpenGLRasterDevice@@UAEXXZ
 */
 
+// Description: original rOpenGL.dll+0x20755 EndScene calls GDI32
+// SwapBuffers before base EndScene; success BOOL=TRUE observed.
+// Origin: LEGACY_CPP. Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005:
+// 96 complete native phases on original renderer, 144 on workaround).
+// C++ fidelity not established; physical GPU/compositor display UNKNOWN.
+// Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
 void B_OpenGLRasterDevice::EndScene()
 {
     if (this->showStats)

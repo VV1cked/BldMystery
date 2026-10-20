@@ -10,6 +10,11 @@
 #include <BBLibc/Vararg.h>
 #include <math.h>
 
+// Description: Blade.exe+0x3B644 advances 1/64-s notification ticks;
+// Slot passes follow pairs of ticks or a final unpaired tick.
+// Origin: ASM_RETAINED. Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-002);
+// not proof of a global fixed physics timestep.
+// Report: CODEX_002_TIME_ARCHITECTURE_RESULTS_2026-10-19.md
 extern "C" void WorldAdvanceToFrame(B_World *world, int frame);
 
 /*
@@ -177,6 +182,12 @@ void B_World::ProcessScheduledFuncs(double time)
 * Entry point:            0x0043C5FD
 * VC++ mangling:          ?Update@B_World@@QAEXPAVB_ViewPose@@PAXNH@Z
 */
+// Description: Blade.exe+0x3C5FD calls GoToTime, one Frame pass and
+// conditional renderer virtual+0xF0 plus map facade +0x31B8B.
+// Origin: STUB (!BLD_NATIVE); real execution remains original ASM.
+// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005), native paths only;
+// no validation of the empty C++ body. Unknown: inner map emission.
+// Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
 #ifndef BLD_NATIVE
 void B_World::Update(
     B_ViewPose *viewPose, void *cameraView, double time, int updateRaster)

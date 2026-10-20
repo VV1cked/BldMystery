@@ -490,6 +490,13 @@ void B_App::SetTimeSpeed(double speed)
 * VC++ mangling:          ?ProcessEvents@B_App@@UAE_NXZ
 */
 
+// Description: Blade.exe+0x121CE orchestrates StartScene -> [World.Update]
+// -> AfterFrame -> [UI.Draw] -> EndScene. Menu can skip World.Update.
+// Origin: LEGACY_CPP. Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005,
+// 240 original-engine phases; AfterFrame precedes UI/platform swap).
+// C++ equivalence: NOT ESTABLISHED by these native-only observations.
+// Scope: Barb_M1, tested Game/Menu; inactive/dedicated paths remain untested.
+// Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
 bool B_App::ProcessEvents()
 {
     bool updateRaster = !IsDedicatedServer();

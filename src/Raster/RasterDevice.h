@@ -185,6 +185,12 @@ public:
     virtual void unknown0E4() = 0;
     virtual void unknown0E8() = 0;
     virtual void unknown0EC() = 0;
+    // Description: Blade.exe+0x3C7A3 calls renderer virtual+0xF0.
+    // Origin: INTERFACE_ONLY (no-argument signature is a legacy declaration).
+    // Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-005): original caller
+    // passes three pointer arguments, unlike this declaration.
+    // Unknown: exact signature/stack cleanup; do not change ABI yet.
+    // Report: CODEX_005_FRAME_PRESENTATION_RESULTS_2026-10-20.md
     virtual void unknown0F0() = 0;
     virtual void unknown0F4() = 0;
     virtual void unknown0F8() = 0;

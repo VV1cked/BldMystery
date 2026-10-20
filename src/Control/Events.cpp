@@ -47,6 +47,13 @@ B_EventFuncs::B_EventFuncs(const B_Name &name)
 * Entry point:            0x0048AB7F
 * VC++ mangling:          ?AddPyFunc@B_EventFuncs@@QAEXIPAUPyObject@@PBD@Z
 */
+// Description: Blade.exe+0x8AB7F registers a Python event callback;
+// repeated registration replaces the handler (refcount +1/-1 observed).
+// Origin: STUB (!BLD_NATIVE); original path remains native ASM.
+// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-001, H02 partial);
+// NOT a differential validation of this empty C++ body.
+// Unknown: initial registration/error path and native/Python coexistence.
+// Report: CODEX_001_R1_RESULTS_2026-10-19.md
 #ifndef BLD_NATIVE
 void B_EventFuncs::AddPyFunc(
     unsigned int eventIndex, PyObject *func, const char *name)

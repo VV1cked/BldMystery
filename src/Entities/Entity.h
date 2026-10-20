@@ -63,16 +63,23 @@ public:
     virtual void unknown_method08C();
     virtual void unknown_method090();
     virtual void unknown_method094();
-    // B_World::GoToTime passes the computed frame time through this slot for
-    // every entity in the "Slot" subscription list. Hypothesis: this is a
-    // time-driven state update. Actor evaluates animation and pose; Spark
-    // advances its effect state. Aura, Camera, and PhysicSI use no-op stubs;
-    // other entity types remain unverified.
+    // Description: Blade.exe+0x3B7A8 Slot virtual+0x98 receives world time.
+    // Origin: INTERFACE_ONLY (this declaration is not a reconstructed body).
+    // Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-003): Particle target
+    // 0x00530CFA uses dt=time-previousTime; other classes untested.
+    // Report: CODEX_003_SLOT_PARTICLE_RESULTS_2026-10-19.md
     virtual void unknown_method098(double time);
     virtual void unknown_method09C();
     virtual void unknown_method0A0();
     // l0043AC3D passes the scheduled subscription timestamp as a double.
     virtual void unknown_method0A4(double time);
+    // Description: Blade.exe+0x3C319 Frame virtual+0xA8 receives the
+    // integer in world+0x18F4; Particle resolves target 0x004D10B0.
+    // Origin: INTERFACE_ONLY (no C++ callback implementation proven here).
+    // Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-004): Python
+    // FrameFunc(name, integer) once per World.Update for tested Particle.
+    // Unknown: integer meaning, behavior of other entity classes.
+    // Report: CODEX_004_FRAME_PIN_RESULTS_2026-10-19.md
     virtual void unknown_method0A8();
     virtual void unknown_method0AC();
     virtual void unknown_method0B0();

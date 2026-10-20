@@ -20,6 +20,16 @@ void ParticlePin(B_Entity *entity) {
 * Module:                 Blade.exe
 * Entry point:            0x00530CFA
 * VC++ mangling:          ?unknown_method098@B_ParticleEntity@@UAEXN@Z
+* Description: Slot vtable+0x98 receives absolute world time and
+* computes dt=time-previousTime (this+0x268); observed 1/64, 2/64 s.
+* Origin: LEGACY_CPP (implementation predates current reconstruction policy).
+* Validation: PARTIAL_DIFFERENTIAL in the reported Particle ASM regression
+* (214 comparisons, tolerance 1e-12) and original free-flight traces;
+* original hit/query-to-Pin path also observed in CODEX-004.
+* Unknown: full collision/expiry and other entity behaviors; those branches
+* must not inherit the free-flight differential claim.
+* Report (movement/tests): CODEX_003_SLOT_PARTICLE_RESULTS_2026-10-19.md
+* Report (Pin transition): CODEX_004_FRAME_PIN_RESULTS_2026-10-19.md
 */
 void B_ParticleEntity::unknown_method098(double time) {
     // Original uses strict >: equality and unordered continue movement.
