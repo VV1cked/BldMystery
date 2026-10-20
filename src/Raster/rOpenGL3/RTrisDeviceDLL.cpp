@@ -145,6 +145,15 @@ void B_TrisDevice::unknown034()
 * Entry point:            0x10030E68
 * VC++ mangling:          ?unknown0F0@B_TrisDevice@@UAEXXZ
 */
+// Description: Original rOpenGL.dll+0x30E68 builds six oriented,
+// plane-clipped face records from three B_Vector-compatible pointer arguments.
+// Records live at this+0x9C8/+0xD30/+0x1098/+0x1400/+0x1768/+0x1AD0;
+// original +0x313DE subsequently submits all six via virtual+0x244.
+// Origin: STUB for this non-native C++ body; original ASM remains separate.
+// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE for observed original calls;
+// face construction is decoded from recovered ASM, not C++ equivalence.
+// Unknown: full input ownership/lifetime, all backends, exact draw effects.
+// Evidence: CODEX-006 / OBS-0062 / CODEX_006_STATIC_TRIS_F0_ANALYSIS_2026-10-20.md
 #ifndef BLD_NATIVE
 void B_TrisDevice::unknown0F0()
 {
