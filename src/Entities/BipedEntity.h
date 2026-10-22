@@ -18,12 +18,29 @@ public:
 };
 
 
+// Borrowed prefix of the original named event-definition object, not an owner.
+// Description: +0x10 float phases, +0x14 phase count, +0x24 parallel event IDs.
+// Origin: INTERFACE_ONLY. Validation: ORIGINAL_BEHAVIOR_IN_SCOPE.
+// The original +0x69171 bounds by phase count; no ID-count check is performed.
+// Evidence: CODEX-RECON-002 / CODEX_RECON_002_GET_EVENT_TIME_RESULTS_2026-10-22.md
+struct B_AnimationEventDefinition
+{
+    char unknown_fields[0x10];
+    float *phases;
+    unsigned int numPhases;
+    char unknown_fields18[0x0C];
+    int *eventIndices;
+};
+
+
 class B_BipedAction : public B_NamedObj
 {
 public:
     double GetEventTime(const char *eventName);
 
-    char unknown_fields[0x28];
+    char unknown_fields[0x18];
+    B_AnimationEventDefinition *animationEvents;
+    char unknown_fields28[0x0C];
     B_EventFuncs *eventTable;
 };
 

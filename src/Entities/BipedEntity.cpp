@@ -1,6 +1,7 @@
 #include <Entities/BipedEntity.h>
 
 #include <bld_system.h>
+#include "bld_misc_funcs.h"
 
 
 /*
@@ -15,12 +16,34 @@
 * Entry point:            0x004D6B8A
 * VC++ mangling:          ?GetEventTime@B_BipedAction@@QAENPBD@Z
 */
-#ifndef BLD_NATIVE
+// Description: original +0xD6B8A returns the first stored float phase for
+// an event ID above the strict float threshold 0xB58637BD, promoted to double.
+// Missing definition/match returns -1. A non-null definition interns names
+// through GetEventIndex; the null-definition branch leaves the namespace alone.
+// The x87 helper also accepts unordered (NaN) phases. It bounds by phase count,
+// not the separate ID count, and leaves action/definition storage unchanged.
+// Origin: PROTOCOL_CPP (CODEX-RECON-002).
+// Validation: PARTIAL_DIFFERENTIAL; 19 original/candidate bit-exact returns,
+// namespace counts, read-only storage and x86 thiscall/ST0/RET 4 agree.
+// Unknown: full preloaded namespace, non-null callback-table runtime, invalid
+// pointers, inconsistent storage, OOM, FP status flags and unmasked FP traps.
+// Evidence: CODEX-RECON-002 / CODEX_RECON_002_GET_EVENT_TIME_RESULTS_2026-10-22.md
 double B_BipedAction::GetEventTime(const char *eventName)
 {
-    return 0.0;
+    if (animationEvents == NULL)
+        return -1.0;
+
+    int eventIndex = gbl_events.GetEventIndex(eventName);
+    for (unsigned int i = 0; i < animationEvents->numPhases; ++i)
+    {
+        float phase = animationEvents->phases[i];
+        // FCOMP's C0 test accepts unordered too; a plain '>' loses NaN.
+        if (!(phase <= -1.0e-6f) &&
+            animationEvents->eventIndices[i] == eventIndex)
+            return static_cast<double>(phase);
+    }
+    return -1.0;
 }
-#endif
 
 /*
 ................................................................................
