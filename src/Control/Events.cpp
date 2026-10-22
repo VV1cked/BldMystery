@@ -60,19 +60,35 @@ B_EventFuncs::B_EventFuncs(const B_Name &name)
 // Original static +0x8AB7F preserves the native func field, decrements the
 // previous pyFunc before incrementing func, and borrows the name pointer.
 // In particular, do not reorder the decref/incref for identical pointers.
-// Origin: STUB (!BLD_NATIVE); original path remains native ASM.
-// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (CODEX-001, H02 partial);
-// NOT a differential validation of this empty C++ body.
-// Unknown: initial/error and last-reference alias runtime behavior; native/
+// Origin: PROTOCOL_CPP.
+// Validation: PARTIAL_DIFFERENTIAL; original/candidate retained-reference
+// replacement deltas agree. Native preservation has original static proof
+// and a candidate-only supporting fixture, not mixed runtime equivalence.
+// Unknown: allocation failure and last-reference alias runtime behavior; native/
 // Python coexistence has static proof, but no mixed runtime differential.
 // Evidence: CODEX-RECON-001 / CODEX_RECON_001_RESULTS_2026-10-22.md
 // Prior runtime: CODEX_001_R1_RESULTS_2026-10-19.md
-#ifndef BLD_NATIVE
 void B_EventFuncs::AddPyFunc(
     unsigned int eventIndex, PyObject *func, const char *name)
 {
+    unsigned int i = eventIndex / NUM_EVENT_FUNCS;
+    unsigned int j = eventIndex % NUM_EVENT_FUNCS;
+    if (eventFuncs.size <= i)
+    {
+        unsigned int firstNew = eventFuncs.size;
+        eventFuncs.Resize(i + 1, true);
+        for (; firstNew < eventFuncs.size; ++firstNew)
+            eventFuncs.elements[firstNew] = NULL;
+    }
+    if (eventFuncs.elements[i] == NULL)
+        eventFuncs.elements[i] = new B_EventFunc[NUM_EVENT_FUNCS];
+    B_EventFunc &slot = eventFuncs.elements[i][j];
+    // Preserve original DECREF-before-INCREF ordering, including old == func.
+    Py_XDECREF(slot.pyFunc);
+    Py_XINCREF(func);
+    slot.pyFunc = func;
+    slot.name = name;
 }
-#endif
 
 /*
 * Module:                 Blade.exe
@@ -173,19 +189,52 @@ int B_EventFuncs::CallFunc(B_Entity *entity, unsigned int eventIndex)
 */
 // Description: original +0x8B74A uses a case-sensitive cached/hash lookup,
 // creates a missing event with the next array index, then indexes it.
-// Origin: STUB (!BLD_NATIVE); original path remains native ASM.
-// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (original static lookup only);
-// C++ equivalence is NOT ESTABLISHED.
-// Unknown: NULL/OOM behavior and numeric runtime oracle. Original accesses
-// buckets from this+0x1C and a cached event at this+0x1820; the current
-// B_Events declaration contains only the leading pointer array.
+// Origin: PROTOCOL_CPP.
+// Validation: PARTIAL_DIFFERENTIAL; numeric lookup sequence compared with
+// original runtime in CODEX-RECON-001; allocation failure is not covered.
+// Unknown: NULL/OOM behavior; no new defensive checks are introduced.
+// Original insertion does not update the last-item cache; only a lookup hit
+// updates it. Both arrays retain their original insertion order.
 // Evidence: CODEX-RECON-001 / CODEX_RECON_001_RESULTS_2026-10-22.md
-#ifndef BLD_NATIVE
 int B_Events::GetEventIndex(const char *event_name)
 {
-    return 0;
+    B_Event *event = eventHash.Get(event_name);
+    if (event == NULL)
+    {
+        event = new B_Event(B_Name(event_name), events.size);
+        events.Append(event);
+        eventHash.Add(event);
+    }
+    return event->index;
 }
-#endif
+
+// Description: original global initializer +8BF20 / teardown +8C02A.
+// Initialize hash control words explicitly, including for non-static objects.
+// Destroy owning buckets in ascending order before the non-owning index array.
+// Origin: LEGACY_CPP (container-based layout support; native global init retained).
+// Validation: PARTIAL_DIFFERENTIAL; initialization/layout and lookup fixtures.
+// Unknown: allocation failure and arbitrary mutation of ownership flags.
+// Evidence: CODEX-RECON-001 / CODEX_RECON_001_RESULTS_2026-10-22.md
+B_Events::B_Events()
+{
+    eventHash.size = 0;
+    eventHash.unknown1804 = 1;
+    eventHash.lastItem = NULL;
+}
+
+// Description: mirror original +8C02A bucket ownership/order for C++ objects.
+// Origin: LEGACY_CPP (layout support; native global teardown retained).
+// Validation: ORIGINAL_BEHAVIOR_IN_SCOPE (static cleanup); candidate ownership
+// regression passes, but original heap/destructor differential is NOT RUN.
+// Unknown: mutated ownership flags and allocation-failure states.
+// Evidence: CODEX-RECON-001 / CODEX_RECON_001_RESULTS_2026-10-22.md
+B_Events::~B_Events()
+{
+    eventHash.lastItem = NULL;
+    for (unsigned int i = 0; i < 256; ++i)
+        eventHash.hash[i].Clear(eventHash.unknown1804);
+    eventHash.size = 0;
+}
 
 /*
 ................................................................................
