@@ -806,6 +806,8 @@ externdef _CheckAnims: near
 l0046E93B equ _CheckAnims
 externdef _GiveAnims: near
 l0046EBFD equ _GiveAnims
+externdef ?SampleRoot@B_SampledRootAdapterView@@QAEXNPANPAX@Z: near
+l00470BF5 equ ?SampleRoot@B_SampledRootAdapterView@@QAEXNPANPAX@Z
 externdef ??0anim_t@@QAE@XZ: near
 l00475B9C equ ??0anim_t@@QAE@XZ
 externdef ?AddEvent@anim_t@@QAEXABVB_Name@@M@Z: near
