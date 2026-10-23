@@ -530,6 +530,10 @@
 					RelativePath="..\Control\Events.h"
 					>
 				</File>
+				<File RelativePath="..\Control\SampledRoot.cpp" />
+				<File RelativePath="..\Control\SampledRoot.h" />
+				<File RelativePath="..\Control\SampledQuaternion.cpp" />
+				<File RelativePath="..\Control\SampledQuaternion.h" />
 			</Filter>
 			<Filter
 				Name="Math"

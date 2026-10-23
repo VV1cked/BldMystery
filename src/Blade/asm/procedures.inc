@@ -774,6 +774,8 @@ externdef _SetSectorFuncProperty: near
 l0045CB7C equ _SetSectorFuncProperty
 externdef _GetSectorFuncProperty: near
 l0045CCD8 equ _GetSectorFuncProperty
+externdef ?B_DecodeSampledQuaternion@@YAXPAMPBF@Z: near
+l004669B0 equ ?B_DecodeSampledQuaternion@@YAXPAMPBF@Z
 externdef _GetAnimationDuration: near
 l0046AB6A equ _GetAnimationDuration
 externdef _RStepEvents: near
@@ -808,6 +810,10 @@ externdef _GiveAnims: near
 l0046EBFD equ _GiveAnims
 externdef ?SampleRoot@B_SampledRootAdapterView@@QAEXNPANPAX@Z: near
 l00470BF5 equ ?SampleRoot@B_SampledRootAdapterView@@QAEXNPANPAX@Z
+externdef ?B_BlendSampledQuaternion@@YAXPAMPBFM1@Z: near
+l00470CCC equ ?B_BlendSampledQuaternion@@YAXPAMPBFM1@Z
+externdef ?SampleQuaternion@B_SampledRootAdapterView@@QAEXNIPAMPAX@Z: near
+l00470E13 equ ?SampleQuaternion@B_SampledRootAdapterView@@QAEXNIPAMPAX@Z
 externdef ??0anim_t@@QAE@XZ: near
 l00475B9C equ ??0anim_t@@QAE@XZ
 externdef ?AddEvent@anim_t@@QAEXABVB_Name@@M@Z: near
