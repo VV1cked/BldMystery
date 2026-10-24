@@ -119,7 +119,6 @@
 /EXPORT:ChangeEntityArrow
 /EXPORT:SeverLimb
 /EXPORT:SetCombatGroup
-/EXPORT:SubscribeEntityToList
 /EXPORT:MessageEvent
 /EXPORT:InterruptCombat
 /EXPORT:GetParticleEntity
@@ -132,7 +131,6 @@
 /EXPORT:Abs2RelVectorN
 /EXPORT:Abs2RelPointN
 /EXPORT:SQDistance2
-/EXPORT:RemoveEntityFromList
 /EXPORT:CreateTimer
 /EXPORT:GetnTimers
 /EXPORT:GetTimerInfo
@@ -155,8 +153,6 @@
 /EXPORT:AddSoundAnim
 /EXPORT:AddSoundEvent
 /EXPORT:RemoveScheduledFunc
-/EXPORT:GetnScheduledFuncs
-/EXPORT:GetScheduledFunc
 /EXPORT:EntityRotate
 /EXPORT:EntityRotateAbs
 /EXPORT:EntityRotateRel

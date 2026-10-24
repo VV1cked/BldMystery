@@ -39,7 +39,16 @@ if (BLD_NATIVE)
         ${TARGET} PRIVATE WINDOWS_IGNORE_PACKING_MISMATCH BLD_NATIVE
     )
     set(EXPORT_FUNCTIONS_FILE "${PROJECT_SOURCE_DIR}/asm/export_cmd.txt")
+    if (NOT EXISTS "${EXPORT_FUNCTIONS_FILE}")
+        message(FATAL_ERROR "Native Blade export response file is missing: ${EXPORT_FUNCTIONS_FILE}")
+    endif()
+    file(STRINGS "${EXPORT_FUNCTIONS_FILE}" BLADE_NATIVE_EXPORTS REGEX "^/EXPORT:")
+    if (NOT BLADE_NATIVE_EXPORTS)
+        message(FATAL_ERROR "Native Blade export response file has no /EXPORT directives; regenerate it before building")
+    endif()
+    unset(BLADE_NATIVE_EXPORTS)
     target_link_options(${TARGET} PRIVATE "@${EXPORT_FUNCTIONS_FILE}")
+    set_property(TARGET ${TARGET} APPEND PROPERTY LINK_DEPENDS "${EXPORT_FUNCTIONS_FILE}")
 endif()
 
 target_compile_definitions(
