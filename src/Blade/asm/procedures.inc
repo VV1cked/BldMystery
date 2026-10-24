@@ -782,6 +782,8 @@ externdef _SetSectorFuncProperty: near
 l0045CB7C equ _SetSectorFuncProperty
 externdef _GetSectorFuncProperty: near
 l0045CCD8 equ _GetSectorFuncProperty
+externdef ?RootMatrix@B_PoseCacheView@@QAEPAVB_Matrix@@XZ: near
+l00464A45 equ ?RootMatrix@B_PoseCacheView@@QAEPAVB_Matrix@@XZ
 externdef ?B_DecodeSampledQuaternion@@YAXPAMPBF@Z: near
 l004669B0 equ ?B_DecodeSampledQuaternion@@YAXPAMPBF@Z
 externdef _GetAnimationDuration: near

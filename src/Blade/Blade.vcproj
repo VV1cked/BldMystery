@@ -663,6 +663,10 @@
 				Name="Person"
 				>
 				<File
+					RelativePath="..\Person\PoseCacheView.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\Person\Person.cpp"
 					>
 				</File>

@@ -439,6 +439,14 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="Person"
+				>
+				<File
+					RelativePath=".\Blade\Person\PoseCacheViewTests.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="AnalyticGeometry"
 				>
 				<File
