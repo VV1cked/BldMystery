@@ -164,7 +164,9 @@ B_Vector operator *(const B_Vector& vector, const B_Matrix &matrix)
 * Validation: DIFFERENTIAL_IN_SCOPE; original repeat and x86 /Od,/O2;
 * 256 cluster cases, exact buffer bytes/x87 status; five sequential native
 * switches with retained ASM CALL sites and sampled199 regressions all pass.
-* Full native-created pose startup remains blocked; geometry runtime not run.
+* Integration: native-created pose116 matrices/cache/FP match original;
+* this body executed inside the real pose query fixture. Geometry startup
+* reached four pipeline entries; first real multiply16 matched original.
 * Unknown: Non-x86 FP parity and exceptional/non-default FP environments.
 * Evidence: CODEX-RECON-008 / CODEX_RECON_008_MATRIX_CORE_RESULTS_2026-10-24.md
 */
@@ -187,7 +189,9 @@ B_Vector Rotate(const B_Vector &v, const B_Matrix &rotateMatrix)
 * Validation: DIFFERENTIAL_IN_SCOPE; original repeat and x86 /Od,/O2;
 * 256 cluster cases, exact buffer bytes/x87 status; five sequential native
 * switches with retained ASM CALL sites and sampled199 regressions all pass.
-* Full native-created pose startup remains blocked; geometry runtime not run.
+* Integration: native-created pose116 matrices/cache/FP match original;
+* this body executed inside the real pose query fixture. Geometry startup
+* reached four pipeline entries; first real multiply16 matched original.
 * Unknown: Original decorated name; invalid buffers are outside the contract.
 * Evidence: CODEX-RECON-008 / CODEX_RECON_008_MATRIX_CORE_RESULTS_2026-10-24.md
 */
@@ -208,7 +212,9 @@ void B_Matrix::SetTranslation(const B_Vector &v)
 * Validation: DIFFERENTIAL_IN_SCOPE; original repeat and x86 /Od,/O2;
 * 256 cluster cases, exact buffer bytes/x87 status; five sequential native
 * switches with retained ASM CALL sites and sampled199 regressions all pass.
-* Full native-created pose startup remains blocked; geometry runtime not run.
+* Integration: native-created pose116 matrices/cache/FP match original;
+* this body executed inside the real pose query fixture. Geometry startup
+* reached four pipeline entries; first real multiply16 matched original.
 * Unknown: Original decorated name; FP modes beyond PC53/nearest and non-x86.
 * Evidence: CODEX-RECON-008 / CODEX_RECON_008_MATRIX_CORE_RESULTS_2026-10-24.md
 */
@@ -230,7 +236,9 @@ void B_MultiplyMatrices(B_Matrix &out, const B_Matrix &a, const B_Matrix &b)
 * Validation: DIFFERENTIAL_IN_SCOPE; original repeat and x86 /Od,/O2;
 * 256 cluster cases, exact buffer bytes/x87 status; five sequential native
 * switches with retained ASM CALL sites and sampled199 regressions all pass.
-* Full native-created pose startup remains blocked; geometry runtime not run.
+* Integration: native-created pose116 matrices/cache/FP match original;
+* this body executed inside the real pose query fixture. Geometry startup
+* reached four pipeline entries; first real multiply16 matched original.
 * Unknown: Original decorated name; exceptional and non-default FP modes.
 * Evidence: CODEX-RECON-008 / CODEX_RECON_008_MATRIX_CORE_RESULTS_2026-10-24.md
 */

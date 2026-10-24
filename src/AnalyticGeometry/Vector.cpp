@@ -10,7 +10,8 @@
 * Validation: DIFFERENTIAL_IN_SCOPE; original repeat and x86 /Od,/O2;
 * 256 cluster cases, exact buffer bytes/x87 status; five sequential native
 * switches with retained ASM CALL sites and sampled199 regressions all pass.
-* Full native-created pose startup remains blocked; geometry runtime not run.
+* Integration: native-created pose116 and bounded geometry startup pass;
+* this negation body was not called by pose116 (direct differential retained).
 * Unknown: Original decorated name; NaNs, unmasked exceptions, non-default FP.
 * Evidence: CODEX-RECON-008 / CODEX_RECON_008_MATRIX_CORE_RESULTS_2026-10-24.md
 */
