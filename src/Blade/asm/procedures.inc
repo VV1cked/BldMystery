@@ -6,6 +6,12 @@ externdef ??0B_Matrix@@QAE@ABVB_Vector@@@Z: near
 l00404F2F equ ??0B_Matrix@@QAE@ABVB_Vector@@@Z
 externdef ?TranslationVector@B_Matrix@@QBE?AVB_Vector@@XZ: near
 l0040571F equ ?TranslationVector@B_Matrix@@QBE?AVB_Vector@@XZ
+externdef ?SetTranslation@B_Matrix@@QAEXABVB_Vector@@@Z: near
+l0040578A equ ?SetTranslation@B_Matrix@@QAEXABVB_Vector@@@Z
+externdef ?RigidInverse@B_Matrix@@QBEXAAV1@@Z: near
+l00405AA2 equ ?RigidInverse@B_Matrix@@QBEXAAV1@@Z
+externdef ?B_MultiplyMatrices@@YAXAAVB_Matrix@@ABV1@1@Z: near
+l00406547 equ ?B_MultiplyMatrices@@YAXAAVB_Matrix@@ABV1@1@Z
 externdef ??D@YA?AVB_Vector@@ABV0@ABVB_Matrix@@@Z: near
 l00406903 equ ??D@YA?AVB_Vector@@ABV0@ABVB_Matrix@@@Z
 externdef ?Rotate@@YA?AVB_Vector@@ABV1@ABVB_Matrix@@@Z: near
@@ -30,6 +36,8 @@ externdef ??DB_Vector@@QBE?AV0@N@Z: near
 l0040A3D1 equ ??DB_Vector@@QBE?AV0@N@Z
 externdef ??XB_Vector@@QAEAAV0@N@Z: near
 l0040A493 equ ??XB_Vector@@QAEAAV0@N@Z
+externdef ?Negated@B_Vector@@QBE?AV1@XZ: near
+l0040A509 equ ?Negated@B_Vector@@QBE?AV1@XZ
 externdef ??HB_Vector@@QBE?AV0@ABV0@@Z: near
 l0040A567 equ ??HB_Vector@@QBE?AV0@ABV0@@Z
 externdef ??ZB_Vector@@QAEABV0@ABV0@@Z: near

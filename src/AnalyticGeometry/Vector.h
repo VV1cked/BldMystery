@@ -25,6 +25,7 @@ public:
     B_Vector operator +(const B_Vector &that) const;
     const B_Vector &operator -=(const B_Vector &that);
     void SetAngle(double angle);
+    B_Vector Negated() const;
 
     double x;
     double y;

@@ -1,5 +1,27 @@
 #include <AnalyticGeometry/Vector.h>
 
+/*
+* Module:                 Blade.exe
+* Entry point:            0x0040A509
+* VC++ mangling:          ?Negated@B_Vector@@QBE?AV1@XZ
+* Description: Negate z, y, x into temporaries before writing the hidden return
+* buffer; preserve signed zero and overlapping output. Reconstructed source name.
+* Origin: PROTOCOL_CPP, CODEX-RECON-008; thiscall hidden sret, EAX out, RET 4.
+* Validation: DIFFERENTIAL_IN_SCOPE; original repeat and x86 /Od,/O2;
+* 256 cluster cases, exact buffer bytes/x87 status; five sequential native
+* switches with retained ASM CALL sites and sampled199 regressions all pass.
+* Full native-created pose startup remains blocked; geometry runtime not run.
+* Unknown: Original decorated name; NaNs, unmasked exceptions, non-default FP.
+* Evidence: CODEX-RECON-008 / CODEX_RECON_008_MATRIX_CORE_RESULTS_2026-10-24.md
+*/
+B_Vector B_Vector::Negated() const
+{
+    volatile double rz = -z;
+    volatile double ry = -y;
+    volatile double rx = -x;
+    return B_Vector(rx, ry, rz);
+}
+
 #include <bld_system.h>
 #include <BBLibc/IDataFile.h>
 #include <BBLibc/ODataFile.h>

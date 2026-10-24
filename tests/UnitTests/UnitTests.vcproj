@@ -442,6 +442,10 @@
 				Name="AnalyticGeometry"
 				>
 				<File
+					RelativePath=".\Blade\AnalyticGeometry\MatrixCoreTests.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Blade\AnalyticGeometry\PlaneTests.cpp"
 					>
 				</File>
